@@ -50,16 +50,42 @@
   const status = document.querySelector('[data-form-status]');
   if (form) {
     form.addEventListener('submit', (e) => {
-      e.preventDefault();
+      // Honeypot check — silently block bots
       const honey = form.querySelector('input[name="website_url"]');
-      if (honey && honey.value) { return; } // bot detected, silently drop
-
-      if (status) {
-        status.textContent = 'Thank you. We will be in touch within one business day.';
-        status.style.display = 'block';
-        status.style.color = '#0099FF';
+      if (honey && honey.value) {
+        e.preventDefault();
+        return;
       }
-      form.reset();
+
+      // Submit to Formspree via fetch so the user stays on our page
+      e.preventDefault();
+      const data = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      }).then((response) => {
+        if (response.ok) {
+          if (status) {
+            status.textContent = 'Thank you. We will be in touch within one business day.';
+            status.style.display = 'block';
+            status.style.color = '#0099FF';
+          }
+          form.reset();
+        } else {
+          if (status) {
+            status.textContent = 'Something went wrong. Please email us directly at apotenza@skyviewfg.com.';
+            status.style.display = 'block';
+            status.style.color = '#cc0000';
+          }
+        }
+      }).catch(() => {
+        if (status) {
+          status.textContent = 'Something went wrong. Please email us directly at apotenza@skyviewfg.com.';
+          status.style.display = 'block';
+          status.style.color = '#cc0000';
+        }
+      });
     });
   }
 })();
