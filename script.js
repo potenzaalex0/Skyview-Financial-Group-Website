@@ -57,7 +57,7 @@
         return;
       }
 
-      // Submit to Formspree via fetch so the user stays on our page
+      // Submit to Formspree via fetch, then redirect to thank-you page on success
       e.preventDefault();
       const data = new FormData(form);
       fetch(form.action, {
@@ -66,12 +66,7 @@
         headers: { 'Accept': 'application/json' }
       }).then((response) => {
         if (response.ok) {
-          if (status) {
-            status.textContent = 'Thank you. We will be in touch within one business day.';
-            status.style.display = 'block';
-            status.style.color = '#0099FF';
-          }
-          form.reset();
+          window.location.href = '/thank-you.html';
         } else {
           if (status) {
             status.textContent = 'Something went wrong. Please email us directly at apotenza@skyviewfg.com.';
