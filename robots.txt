@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://skyviewfg.com/sitemap.xml
