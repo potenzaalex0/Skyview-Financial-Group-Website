@@ -1,0 +1,74 @@
+{
+  "redirects": [
+    {
+      "source": "/about-us.html",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/about-us/9-team/20-bio.html",
+      "destination": "/team/alex-r-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/about-us/9-team/22-cindi-mackay.html",
+      "destination": "/team/cindi-mackay.html",
+      "permanent": true
+    },
+    {
+      "source": "/about-us/9-team/23-alexander-j-potenza.html",
+      "destination": "/team/alex-j-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/9-team/20-bio.html",
+      "destination": "/team/alex-r-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/9-team/22-cindi-mackay.html",
+      "destination": "/team/cindi-mackay.html",
+      "permanent": true
+    },
+    {
+      "source": "/9-team/23-alexander-j-potenza.html",
+      "destination": "/team/alex-j-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/resources.html",
+      "destination": "/services.html",
+      "permanent": true
+    },
+    {
+      "source": "/resources/blog.html",
+      "destination": "/blog.html",
+      "permanent": true
+    },
+    {
+      "source": "/resources/blog/25-unlocking-the-backdoor-roth-ira-a-strategic-approach-to-tax-efficient-savings.html",
+      "destination": "/blog/backdoor-roth-ira-strategy.html",
+      "permanent": true
+    },
+    {
+      "source": "/resources/blog/26-converting-your-529-college-savings-plan-to-a-roth-ira-it-s-benefits.html",
+      "destination": "/blog/529-to-roth-ira-rollover.html",
+      "permanent": true
+    },
+    {
+      "source": "/component/tags/tag/financial-planning.html",
+      "destination": "/services.html#financial-planning",
+      "permanent": true
+    },
+    {
+      "source": "/component/tags/tag/investing.html",
+      "destination": "/services.html#investment-management",
+      "permanent": true
+    },
+    {
+      "source": "/images/adv.pdf",
+      "destination": "https://adviserinfo.sec.gov/firm/summary/310581",
+      "permanent": true
+    }
+  ]
+}
