@@ -1036,3 +1036,37 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
     font-size: 1.25rem;
   }
 }
+
+/* ============================================
+   SOCIAL ICONS (FOOTER)
+   ============================================ */
+
+.footer-social {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.65);
+  transition: all 0.3s var(--ease);
+}
+
+.footer-social a:hover {
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
+  background: rgba(0, 153, 255, 0.08);
+}
+
+.footer-social svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
