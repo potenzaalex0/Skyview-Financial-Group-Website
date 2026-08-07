@@ -1,4 +1,40 @@
 User-agent: *
 Allow: /
 
+# AI answer engines and associated crawlers — access is granted explicitly by
+# policy so it cannot be blanket-blocked by a future change. These directives
+# grant crawl/access only; they intentionally add no snippet restrictions.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
 Sitemap: https://skyviewfg.com/sitemap.xml

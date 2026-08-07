@@ -1,11 +1,12 @@
 {
-  "rewrites": [
-    {
-      "source": "/nua",
-      "destination": "/nua.html"
-    }
-  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
     {
       "source": "/about-us.html",
       "destination": "/about.html",
@@ -42,6 +43,11 @@
       "permanent": true
     },
     {
+      "source": "/about-us/:path*",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
       "source": "/resources.html",
       "destination": "/services.html",
       "permanent": true
@@ -62,6 +68,11 @@
       "permanent": true
     },
     {
+      "source": "/resources/:path*",
+      "destination": "/blog.html",
+      "permanent": true
+    },
+    {
       "source": "/component/tags/tag/financial-planning.html",
       "destination": "/services.html#financial-planning",
       "permanent": true
@@ -70,11 +81,82 @@
       "source": "/component/tags/tag/investing.html",
       "destination": "/services.html#investment-management",
       "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
     },
     {
-      "source": "/images/adv.pdf",
-      "destination": "https://adviserinfo.sec.gov/firm/summary/310581",
-      "permanent": true
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/styles.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/script.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        },
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
     }
   ]
 }
