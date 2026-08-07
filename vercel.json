@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/nua",
+      "destination": "/nua.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/about-us.html",
