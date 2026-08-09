@@ -3,6 +3,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/images/adv.pdf",
+      "destination": "https://adviserinfo.sec.gov/firm/summary/310581",
+      "permanent": true
+    },
+    {
       "source": "/index.html",
       "destination": "/",
       "permanent": true
@@ -80,6 +85,36 @@
     {
       "source": "/component/tags/tag/investing.html",
       "destination": "/services.html#investment-management",
+      "permanent": true
+    },
+    {
+      "source": "/529-to-roth-ira-rollover.html",
+      "destination": "/blog/529-to-roth-ira-rollover.html",
+      "permanent": true
+    },
+    {
+      "source": "/backdoor-roth-ira-strategy.html",
+      "destination": "/blog/backdoor-roth-ira-strategy.html",
+      "permanent": true
+    },
+    {
+      "source": "/hsa-shoebox-strategy.html",
+      "destination": "/blog/hsa-shoebox-strategy.html",
+      "permanent": true
+    },
+    {
+      "source": "/alex-r-potenza.html",
+      "destination": "/team/alex-r-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/alex-j-potenza.html",
+      "destination": "/team/alex-j-potenza.html",
+      "permanent": true
+    },
+    {
+      "source": "/cindi-mackay.html",
+      "destination": "/team/cindi-mackay.html",
       "permanent": true
     }
   ],
