@@ -103,6 +103,36 @@
       "permanent": true
     },
     {
+      "source": "/rsu-tax-withholding.html",
+      "destination": "/blog/rsu-tax-withholding.html",
+      "permanent": true
+    },
+    {
+      "source": "/iso-vs-nqso-tax-difference.html",
+      "destination": "/blog/iso-vs-nqso-tax-difference.html",
+      "permanent": true
+    },
+    {
+      "source": "/10b5-1-plan-explained.html",
+      "destination": "/blog/10b5-1-plan-explained.html",
+      "permanent": true
+    },
+    {
+      "source": "/83b-election-explained.html",
+      "destination": "/blog/83b-election-explained.html",
+      "permanent": true
+    },
+    {
+      "source": "/pre-liquidity-planning-checklist.html",
+      "destination": "/blog/pre-liquidity-planning-checklist.html",
+      "permanent": true
+    },
+    {
+      "source": "/roth-conversion-after-moving-to-florida.html",
+      "destination": "/blog/roth-conversion-after-moving-to-florida.html",
+      "permanent": true
+    },
+    {
       "source": "/alex-r-potenza.html",
       "destination": "/team/alex-r-potenza.html",
       "permanent": true
