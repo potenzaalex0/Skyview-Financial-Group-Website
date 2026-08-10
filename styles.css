@@ -608,6 +608,22 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
 .footer-disclosure a { color: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(255,255,255,0.2); }
 .footer-disclosure a:hover { color: var(--white); }
 
+/* Article/tool-specific compliance disclosure (e.g. NUA calculator).
+   Slightly brighter than .footer-disclosure: this is required disclosure text
+   and must stay legible. */
+.article-tax-disclosure {
+  max-width: 90ch;
+  margin: 28px 0 0;
+  padding: 20px 24px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.62);
+}
+.article-tax-disclosure p + p { margin-top: 12px; }
+
+
 @media (max-width: 900px) {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
   .footer-brand { grid-column: 1 / -1; }
