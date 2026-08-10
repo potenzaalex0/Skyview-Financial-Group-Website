@@ -1,16 +1,35 @@
+# https://skyviewfg.com/robots.txt
+# Skyview Financial Group, LLC
+# Default posture: open. Every directive below grants access; none restricts it.
+
 User-agent: *
 Allow: /
 
-# AI answer engines and associated crawlers — access is granted explicitly by
-# policy so it cannot be blanket-blocked by a future change. These directives
-# grant crawl/access only; they intentionally add no snippet restrictions.
-User-agent: GPTBot
+# ----- Traditional search crawlers -----
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ----- AI answer engines and grounding/retrieval crawlers -----
+# Granted explicitly so a future blanket change cannot silently remove access.
+User-agent: Google-Extended
 Allow: /
 
 User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
 Allow: /
 
 User-agent: PerplexityBot
@@ -29,12 +48,6 @@ User-agent: Claude-SearchBot
 Allow: /
 
 User-agent: Applebot-Extended
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Bingbot
 Allow: /
 
 Sitemap: https://skyviewfg.com/sitemap.xml
