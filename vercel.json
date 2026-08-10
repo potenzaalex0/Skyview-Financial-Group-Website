@@ -13,6 +13,11 @@
       "permanent": true
     },
     {
+      "source": "/nua",
+      "destination": "/nua.html",
+      "permanent": true
+    },
+    {
       "source": "/about-us.html",
       "destination": "/about.html",
       "permanent": true
