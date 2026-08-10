@@ -1,0 +1,97 @@
+name: IndexNow submit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+      - 'sitemap.xml'
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Submit every URL in sitemap.xml instead of only changed files'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Resolve IndexNow key
+        id: key
+        env:
+          SECRET_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: |
+          KEY="$SECRET_KEY"
+          if [ -z "$KEY" ]; then
+            # Fall back to the public key file committed at the repo root.
+            F="$(ls -1 [0-9a-f][0-9a-f]*.txt 2>/dev/null | head -1 || true)"
+            if [ -n "$F" ]; then
+              KEY="$(tr -d '[:space:]' < "$F")"
+              echo "Using key from repo key file (secret INDEXNOW_KEY not set)."
+            fi
+          fi
+          if [ -z "$KEY" ]; then
+            echo "::error::No IndexNow key available."
+            exit 1
+          fi
+          echo "::add-mask::$KEY"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+
+      - name: Collect URLs
+        id: urls
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            grep -oE '<loc>[^<]+</loc>' sitemap.xml | sed -E 's#</?loc>##g' > urls.txt
+          else
+            git diff --name-only --diff-filter=ACM \
+              "${{ github.event.before }}" "${{ github.sha }}" -- '*.html' > changed.txt || true
+            : > urls.txt
+            while read -r f; do
+              [ -z "$f" ] && continue
+              case "$f" in
+                index.html) echo "https://skyviewfg.com/" >> urls.txt ;;
+                thank-you.html) ;;                       # noindex, never submit
+                *) echo "https://skyviewfg.com/$f" >> urls.txt ;;
+              esac
+            done < changed.txt
+          fi
+          COUNT="$(wc -l < urls.txt | tr -d ' ')"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Collected $COUNT URL(s)."
+          cat urls.txt
+
+      - name: Submit to IndexNow
+        if: steps.urls.outputs.count != '0'
+        env:
+          KEY: ${{ steps.key.outputs.key }}
+        run: |
+          set -euo pipefail
+          PAYLOAD="$(jq -R -s -c --arg host skyviewfg.com --arg key "$KEY" \
+            --arg loc "https://skyviewfg.com/${KEY}.txt" \
+            '{host:$host, key:$key, keyLocation:$loc,
+              urlList: (split("\n") | map(select(length>0)))}' < urls.txt)"
+          STATUS="$(curl -sS -o body.txt -w '%{http_code}' -X POST \
+            https://api.indexnow.org/IndexNow \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            --data-raw "$PAYLOAD")"
+          echo "HTTP $STATUS"
+          cat body.txt || true
+          # 200 = accepted+validated, 202 = accepted, validation pending.
+          case "$STATUS" in 200|202) ;; *) exit 1 ;; esac
+
+      - name: Nothing to submit
+        if: steps.urls.outputs.count == '0'
+        run: echo "No changed .html files in this push - exiting clean."
