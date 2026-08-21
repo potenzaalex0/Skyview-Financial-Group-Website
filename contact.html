@@ -242,11 +242,14 @@
             </div>
           </div>
 
-          <!-- Honeypot field - bots fill this; humans don't see it -->
           <div class="form-honeypot" aria-hidden="true">
             <label for="website_url">Website</label>
             <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
+            <label for="_gotcha">Confirm</label>
+            <input type="text" id="_gotcha" name="_gotcha" tabindex="-1" autocomplete="off">
           </div>
+
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAEXJFs8LKyX6rbWM" data-theme="light" data-size="flexible" data-appearance="interaction-only"></div>
 
           <button type="submit" class="btn btn--primary form-submit">Send Message <span class="arrow">→</span></button>
           <p class="form-disclaimer">By submitting this form you acknowledge our <a href="disclaimers.html" style="color:var(--brand-blue);">Privacy Policy</a> and Terms of Use. Skyview Financial Group does not accept trading or money movement instructions via email or this form. Please do not include sensitive financial account information in your message.</p>
@@ -348,6 +351,7 @@
 </footer>
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="script.js" defer></script>
 </body>
 </html>

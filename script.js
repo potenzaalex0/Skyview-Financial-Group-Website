@@ -47,11 +47,18 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
     document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
   }
 
-  // Contact form: honeypot + placeholder handler
-  // NOTE: To make this form functional, point it at a real backend
-  // (Formspree, Basin, Netlify Forms, or your own endpoint) and remove the e.preventDefault()
   const form = document.querySelector('form[data-form="contact"]');
   const status = document.querySelector('[data-form-status]');
+  const showFormError = () => {
+    if (window.turnstile && typeof window.turnstile.reset === 'function') {
+      window.turnstile.reset();
+    }
+    if (status) {
+      status.textContent = 'Something went wrong. Please email us directly at ajpotenza@skyviewfg.com.';
+      status.style.display = 'block';
+      status.style.color = '#cc0000';
+    }
+  };
   if (form) {
     form.addEventListener('submit', (e) => {
       // Honeypot check — silently block bots
@@ -72,18 +79,10 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
         if (response.ok) {
           window.location.href = '/thank-you.html';
         } else {
-          if (status) {
-            status.textContent = 'Something went wrong. Please email us directly at apotenza@skyviewfg.com.';
-            status.style.display = 'block';
-            status.style.color = '#cc0000';
-          }
+          showFormError();
         }
       }).catch(() => {
-        if (status) {
-          status.textContent = 'Something went wrong. Please email us directly at apotenza@skyviewfg.com.';
-          status.style.display = 'block';
-          status.style.color = '#cc0000';
-        }
+        showFormError();
       });
     });
   }
