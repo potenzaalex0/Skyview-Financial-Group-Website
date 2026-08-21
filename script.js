@@ -87,3 +87,16 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
     });
   }
 })();
+
+document.addEventListener('click', function (e) {
+  var link = e.target.closest && e.target.closest('a[href^="tel:"], a[href^="mailto:"]');
+  if (!link) return;
+  if (typeof gtag !== 'function') return;
+  var raw = link.getAttribute('href') || '';
+  var isPhone = raw.indexOf('tel:') === 0;
+  gtag('event', isPhone ? 'phone_click' : 'email_click', {
+    contact_value: raw.replace(/^(tel:|mailto:)/, '').split('?')[0],
+    page_path: window.location.pathname,
+    link_text: (link.textContent || '').trim().slice(0, 100)
+  });
+});
