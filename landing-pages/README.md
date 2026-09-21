@@ -29,28 +29,20 @@ Vercel build log:
 
 - a webinar page whose `SESSIONS` still contain "TBD"
 - a guide page whose PDF is not in the repo
+- guide pages, while `emailDeliveryLive` in `offers/guide.js` is `false`
 
 A skipped page returns 404 instead of going live half-finished.
 
 ## The guide PDF
 
-- Repo path: `guides/understanding-your-equity-compensation.pdf`
-- Public URL: `https://skyviewfg.com/guides/understanding-your-equity-compensation.pdf`
+One PDF per company, named to match the page:
+
+- Repo path: `guides/<slug>-equity-compensation-guide.pdf`
+  (e.g. `guides/jabil-equity-compensation-guide.pdf`)
+- Public URL: `https://skyviewfg.com/guides/<slug>-equity-compensation-guide.pdf`
   (served with `X-Robots-Tag: noindex`, so search engines don't list it)
-- The page never shows this link. Formspree's autoresponse emails it to the
-  address the visitor submitted.
-
-Suggested autoresponse (per guide form):
-
-> Subject: Your equity compensation guide
->
-> Thanks for requesting Understanding Your Equity Compensation.
-> Download the PDF here:
-> https://skyviewfg.com/guides/understanding-your-equity-compensation.pdf
->
-> Skyview Financial Group, LLC · Ponte Vedra Beach, FL
-> This guide is educational and is not individualized advice. Skyview
-> Financial Group does not prepare or file tax returns.
+- The page never shows this link. It goes out by email to the address the
+  visitor submitted.
 
 ## Files
 

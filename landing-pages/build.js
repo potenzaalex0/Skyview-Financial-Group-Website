@@ -11,6 +11,7 @@
    Production safety (VERCEL_ENV=production only; previews build everything):
    - a webinar page whose SESSIONS still contain "TBD" is skipped
    - a guide page whose PDF is missing from the repo is skipped
+   - a guide page is skipped while its offer has emailDeliveryLive: false
 
    No dependencies. Run locally with:  node landing-pages/build.js
    ===================================================================== */
@@ -219,9 +220,14 @@ function build() {
           if (IS_PROD) { skipped.push(`${name} (dates TBD)`); continue; }
         }
       }
-      if (offer.pdf && !fs.existsSync(path.join(ROOT, offer.pdf))) {
-        console.warn(`  WARNING /${name}: ${offer.pdf} is not in the repo yet`);
+      const pdf = offer.pdf && val(offer.pdf, c);
+      if (pdf && !fs.existsSync(path.join(ROOT, pdf))) {
+        console.warn(`  WARNING /${name}: ${pdf} is not in the repo yet`);
         if (IS_PROD) { skipped.push(`${name} (PDF missing)`); continue; }
+      }
+      if (pdf && offer.emailDeliveryLive === false) {
+        console.warn(`  WARNING /${name}: PDF email delivery is not live yet`);
+        if (IS_PROD) { skipped.push(`${name} (email delivery not live)`); continue; }
       }
 
       fs.writeFileSync(path.join(OUT, `${name}.html`), render(c, offer, offerKey));

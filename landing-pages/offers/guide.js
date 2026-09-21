@@ -1,15 +1,21 @@
 /* OFFER: downloadable PDF guide.
    Same shell as the webinar page (build.js). Differences: no speaker block,
-   two-field form, and the PDF is NOT revealed on the page. Formspree's
-   autoresponse emails the download link to the address submitted, so the
-   visitor has to use a real inbox to get the file. */
+   two-field form, and the PDF is NOT revealed on the page. The download link
+   is emailed to the address submitted, so the visitor has to use a real
+   inbox to get the file. */
 
 module.exports = {
   urlSuffix: 'equity-compensation-guide',
 
-  // The PDF, hosted by the site. Its public URL goes in each guide form's
-  // Formspree autoresponse message: https://skyviewfg.com + this path.
-  pdf: '/guides/understanding-your-equity-compensation.pdf',
+  // One PDF per company, hosted by the site at guides/<slug>-equity-compensation-guide.pdf
+  // (e.g. guides/jabil-equity-compensation-guide.pdf). Its public URL is what
+  // the confirmation email links to. It is never shown on the page.
+  pdf: (c) => `/guides/${c.slug}-equity-compensation-guide.pdf`,
+
+  // Flip to true once the confirmation email that carries the PDF link is
+  // live. Until then production skips guide pages, because the page tells
+  // visitors to check their inbox.
+  emailDeliveryLive: false,
 
   title: (c) => `Understanding Your Equity Compensation: A Guide for ${c.COMPANY_NAME} Employees | Skyview Financial Group`,
   description: (c) => `A guide for ${c.COMPANY_NAME} employees. Nine pages on RSUs, stock options, and concentrated positions, plus a worksheet.`,
