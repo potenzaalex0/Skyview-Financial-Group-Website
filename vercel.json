@@ -1,6 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": false,
+  "buildCommand": "node landing-pages/build.js",
+  "rewrites": [
+    {
+      "source": "/:page([a-z0-9-]+-equity-compensation-webinar)",
+      "destination": "/lp/:page.html"
+    },
+    {
+      "source": "/:page([a-z0-9-]+-equity-compensation-guide)",
+      "destination": "/lp/:page.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/images/adv.pdf",
@@ -172,6 +183,19 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/lp/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
