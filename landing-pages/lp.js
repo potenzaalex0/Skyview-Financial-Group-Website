@@ -41,6 +41,8 @@
         var session = data.get('session') || '';
         var slot = wrap.querySelector('[data-selected-session]');
         if (slot) slot.textContent = session;
+        var mail = wrap.querySelector('[data-submitted-email]');
+        if (mail) mail.textContent = data.get('email') || 'your inbox';
         wrap.classList.add('is-done');
         wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (typeof gtag === 'function') {

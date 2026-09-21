@@ -1,8 +1,7 @@
 /* OFFER: webinar seat.
    Everything specific to the webinar lives here. The page shell (logo, hero,
-   speaker, trust row, disclosures, form handling) is shared in build.js, so the
-   upcoming PDF-guide page is a sibling file (offers/guide.js) with its own copy,
-   a two-field form (name, email) and a download link on success. */
+   trust row, disclosures, form handling) is shared in build.js; the PDF-guide
+   page is the sibling file offers/guide.js. */
 
 module.exports = {
   urlSuffix: 'equity-compensation-webinar',
@@ -15,6 +14,7 @@ module.exports = {
   lead: 'A complimentary one-hour webinar. Every attendee receives a written analysis of their own equity grants.',
   heroCta: 'Reserve a seat',
 
+  agendaEyebrow: 'Agenda',
   agendaTitle: 'What we will cover',
   agenda: (c) => [
     'The withholding gap on RSU vesting, and the tax bill it creates in April',
@@ -23,12 +23,17 @@ module.exports = {
     `What a change in ${c.TICKER} does to a retirement plan built around it`,
   ],
 
+  showSpeaker: true,
+
+  formEyebrow: 'Register',
   formTitle: 'Reserve your seat',
   formSub: 'Choose the session that fits your schedule. It takes under a minute.',
   fields: ['name', 'email', 'phone', 'employer'],
   showSessions: true,
   submitLabel: 'Register',
   subject: (c) => `Webinar registration: ${c.COMPANY_NAME}`,
+  consent: 'By registering, you agree that Skyview Financial Group may contact you by email or phone about this event.',
+  disclaimerNoun: 'This presentation',
 
   successTitle: 'You are registered.',
   successBody: (c, h) =>

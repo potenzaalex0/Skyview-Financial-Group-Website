@@ -2,10 +2,15 @@
 /* =====================================================================
    Landing page generator. Runs on every Vercel deploy (see vercel.json).
 
-   Reads every campaign in landing-pages/campaigns/*.js, renders it with the
-   shared shell below plus its offer (offers/<OFFER>.js), and writes
-   /lp/<slug>-<offer suffix>.html. vercel.json rewrites the clean URL
-   /<slug>-equity-compensation-webinar to that file.
+   Reads every campaign in landing-pages/campaigns/*.js and, for each offer
+   listed in its FORMSPREE map (webinar, guide), renders the shared shell
+   below plus offers/<offer>.js into /lp/<slug>-<offer suffix>.html.
+   vercel.json rewrites the clean URL (/<slug>-equity-compensation-webinar,
+   /<slug>-equity-compensation-guide) to that file.
+
+   Production safety (VERCEL_ENV=production only; previews build everything):
+   - a webinar page whose SESSIONS still contain "TBD" is skipped
+   - a guide page whose PDF is missing from the repo is skipped
 
    No dependencies. Run locally with:  node landing-pages/build.js
    ===================================================================== */
@@ -19,6 +24,8 @@ const shared = require('./shared');
 const css = fs.readFileSync(path.join(__dirname, 'lp.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*/g, '');
 const js = fs.readFileSync(path.join(__dirname, 'lp.js'), 'utf8');
 
+const IS_PROD = process.env.VERCEL_ENV === 'production';
+const val = (x, c) => (typeof x === 'function' ? x(c) : x);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const slugify = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
@@ -34,7 +41,7 @@ const LOGO_SVG = `<svg class="brand-mark" viewBox="0 0 80 80" xmlns="http://www.
   [0, 60, 120, 180, 240, 300].map((r, i) => `<g transform="rotate(${r})"><path d="M-9 -26 L0 -16 L9 -26" stroke="${i % 2 ? '#33CCFF' : '#0099FF'}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`).join('')
 }</g></svg>`;
 
-function render(c, offer) {
+function render(c, offer, offerKey) {
   const S = shared.SPEAKER;
   const url = `https://skyviewfg.com/${c.slug}-${offer.urlSuffix}`;
   const campaignId = `${c.slug}-${offer.urlSuffix}`;
@@ -93,7 +100,7 @@ function render(c, offer) {
     </div>
     <span class="eyebrow">${esc(offer.eyebrow)}</span>
     <h1>${offer.headline(c, esc)}</h1>
-    <p class="lead">${esc(offer.lead)}</p>
+    <p class="lead">${esc(val(offer.lead, c))}</p>
     <a href="#register" class="btn btn--primary">${esc(offer.heroCta)} <span class="arrow">→</span></a>
   </div>
 </header>
@@ -102,13 +109,13 @@ function render(c, offer) {
   <div class="container lp-grid">
     <div class="lp-content">
       ${agenda.length ? `<section class="lp-section" aria-labelledby="agenda-h">
-        <span class="eyebrow">Agenda</span>
+        <span class="eyebrow">${esc(offer.agendaEyebrow)}</span>
         <h2 id="agenda-h">${esc(offer.agendaTitle)}</h2>
         <ol class="agenda">
           ${agenda.map((a, i) => `<li><span class="num">0${i + 1}</span><p>${esc(a)}</p></li>`).join('\n          ')}
         </ol>
       </section>` : ''}
-      <section class="lp-section" aria-labelledby="speaker-h">
+      ${offer.showSpeaker ? `<section class="lp-section" aria-labelledby="speaker-h">
         <span class="eyebrow">Your presenter</span>
         <div class="speaker">
           <img src="${S.photo}" width="140" height="196" alt="${esc(S.name)}" loading="lazy" decoding="async">
@@ -118,17 +125,17 @@ function render(c, offer) {
             <p class="bio">${esc(S.bio)}</p>
           </div>
         </div>
-      </section>
+      </section>` : ''}
     </div>
 
     <aside class="lp-aside">
       <div class="lp-form" id="register" data-lp-form data-fallback-email="${esc(shared.FALLBACK_EMAIL)}">
         <div class="form-head">
-          <span class="eyebrow">Register</span>
+          <span class="eyebrow">${esc(offer.formEyebrow)}</span>
           <h2>${esc(offer.formTitle)}</h2>
           <p class="sub">${esc(offer.formSub)}</p>
         </div>
-        <form action="https://formspree.io/f/${esc(c.FORMSPREE_ID)}" method="POST" data-offer="${esc(c.OFFER)}">
+        <form action="https://formspree.io/f/${esc(c.FORMSPREE[offerKey])}" method="POST" data-offer="${esc(offerKey)}">
           ${sessionsHtml}
             ${fieldsHtml}
 
@@ -146,7 +153,7 @@ function render(c, offer) {
           <div class="cf-turnstile" data-sitekey="${shared.TURNSTILE_SITEKEY}" data-theme="light" data-size="flexible" data-appearance="interaction-only"></div>
 
           <button type="submit" class="btn btn--primary form-submit">${esc(offer.submitLabel)} <span class="arrow">→</span></button>
-          <p class="form-disclaimer">By registering, you agree that Skyview Financial Group may contact you by email or phone about this event. See our <a href="/disclaimers.html" target="_blank" rel="noopener">Privacy Policy</a>. Please do not include sensitive financial account information.</p>
+          <p class="form-disclaimer">${esc(offer.consent)} See our <a href="/disclaimers.html" target="_blank" rel="noopener">Privacy Policy</a>. Please do not include sensitive financial account information.</p>
           <p class="form-status" data-form-status role="alert"></p>
         </form>
         <div class="form-success" aria-live="polite">
@@ -168,7 +175,7 @@ function render(c, offer) {
 <footer class="lp-disclosure">
   <div class="container">
     <p class="sponsor">Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.</p>
-    <p>This presentation is educational and is not individualized advice. Skyview Financial Group does not prepare or file tax returns.</p>
+    <p>${esc(offer.disclaimerNoun)} is educational and is not individualized advice. Skyview Financial Group does not prepare or file tax returns.</p>
     ${shared.SEC_DISCLOSURE.map((p) => `<p>${esc(p)}</p>`).join('\n    ')}
     <p class="copy">© ${new Date().getFullYear()} Skyview Financial Group, LLC. All rights reserved.</p>
   </div>
@@ -189,24 +196,40 @@ function build() {
   fs.mkdirSync(OUT, { recursive: true });
 
   const seen = new Set();
+  const skipped = [];
   for (const file of files) {
     const c = { ...require(path.join(dir, file)), file };
-    const need = ['COMPANY_NAME', 'TICKER', 'OFFER', 'FORMSPREE_ID'];
-    for (const k of need) if (!c[k]) throw new Error(`${file}: missing ${k}`);
-    const offerPath = path.join(__dirname, 'offers', `${c.OFFER}.js`);
-    if (!fs.existsSync(offerPath)) throw new Error(`${file}: unknown OFFER "${c.OFFER}"`);
-    const offer = require(offerPath);
-    if (offer.showSessions && !(Array.isArray(c.SESSIONS) && c.SESSIONS.length)) throw new Error(`${file}: SESSIONS required for ${c.OFFER}`);
-
+    for (const k of ['COMPANY_NAME', 'TICKER', 'FORMSPREE']) if (!c[k]) throw new Error(`${file}: missing ${k}`);
     c.slug = c.SLUG || slugify(c.COMPANY_NAME);
-    const name = `${c.slug}-${offer.urlSuffix}`;
-    if (seen.has(name)) throw new Error(`${file}: duplicate page ${name}`);
-    seen.add(name);
 
-    fs.writeFileSync(path.join(OUT, `${name}.html`), render(c, offer));
-    console.log(`  built /${name}  <- campaigns/${file}`);
+    for (const [offerKey, formId] of Object.entries(c.FORMSPREE)) {
+      const offerPath = path.join(__dirname, 'offers', `${offerKey}.js`);
+      if (!fs.existsSync(offerPath)) throw new Error(`${file}: unknown offer "${offerKey}" in FORMSPREE`);
+      if (!formId) throw new Error(`${file}: FORMSPREE.${offerKey} is empty`);
+      const offer = require(offerPath);
+      const name = `${c.slug}-${offer.urlSuffix}`;
+      if (seen.has(name)) throw new Error(`${file}: duplicate page ${name}`);
+      seen.add(name);
+
+      // Production guards
+      if (offer.showSessions) {
+        if (!(Array.isArray(c.SESSIONS) && c.SESSIONS.length)) throw new Error(`${file}: SESSIONS required for ${offerKey}`);
+        if (c.SESSIONS.some((s) => /TBD/i.test(s))) {
+          console.warn(`  WARNING /${name}: session dates are TBD`);
+          if (IS_PROD) { skipped.push(`${name} (dates TBD)`); continue; }
+        }
+      }
+      if (offer.pdf && !fs.existsSync(path.join(ROOT, offer.pdf))) {
+        console.warn(`  WARNING /${name}: ${offer.pdf} is not in the repo yet`);
+        if (IS_PROD) { skipped.push(`${name} (PDF missing)`); continue; }
+      }
+
+      fs.writeFileSync(path.join(OUT, `${name}.html`), render(c, offer, offerKey));
+      console.log(`  built /${name}  <- campaigns/${file}`);
+    }
   }
-  console.log(`Landing pages: ${seen.size} built.`);
+  if (skipped.length) console.warn(`  SKIPPED in production: ${skipped.join(', ')}`);
+  console.log(`Landing pages: ${seen.size - skipped.length} built.`);
 }
 
 build();
