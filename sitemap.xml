@@ -98,7 +98,7 @@
 </url>
 <url>
 <loc>https://skyviewfg.com/blog/10b5-1-plan-explained.html</loc>
-<lastmod>2026-08-09</lastmod>
+<lastmod>2026-09-21</lastmod>
 </url>
 <url>
 <loc>https://skyviewfg.com/blog/83b-election-explained.html</loc>
@@ -111,5 +111,11 @@
 <url>
 <loc>https://skyviewfg.com/blog/roth-conversion-after-moving-to-florida.html</loc>
 <lastmod>2026-08-09</lastmod>
+</url>
+<url>
+<loc>https://skyviewfg.com/blog/asset-location-strategy.html</loc>
+<lastmod>2026-09-21</lastmod>
+<changefreq>yearly</changefreq>
+<priority>0.7</priority>
 </url>
 </urlset>
