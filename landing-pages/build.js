@@ -3,8 +3,12 @@
    Landing page generator. Runs on every Vercel deploy (see vercel.json).
 
    Reads every campaign in landing-pages/campaigns/*.js and, for each offer
-   listed in its FORMSPREE map (webinar, guide), renders the shared shell
-   below plus offers/<offer>.js into /lp/<slug>-<offer suffix>.html.
+   in its OFFERS list (webinar, guide), renders the shared shell below plus
+   offers/<offer>.js into /lp/<slug>-<offer suffix>.html.
+
+   It also writes api/_campaigns.json, which the form handler (api/lead.js)
+   reads to know each campaign's company, sessions and PDF. No secrets go in
+   that file: Vercel serves this repo's source publicly.
    vercel.json rewrites the clean URL (/<slug>-equity-compensation-webinar,
    /<slug>-equity-compensation-guide) to that file.
 
@@ -56,7 +60,7 @@ function render(c, offer, offerKey) {
   const sessionsHtml = offer.showSessions ? `
           <fieldset class="sessions">
             <legend>Choose a session</legend>
-            ${c.SESSIONS.map((s, i) => `<label class="session"><input type="radio" name="session" value="${esc(s)}" required><span class="when"><span class="day">${esc(s.split(' · ')[0])}</span>${s.includes(' · ') ? `<span class="time">${esc(s.split(' · ').slice(1).join(' · '))}</span>` : ''}</span></label>`).join('\n            ')}
+            ${c.SESSIONS.map((when) => `<label class="session"><input type="radio" name="session" value="${esc(when)}" required><span class="when"><span class="day">${esc(when.split(' · ')[0])}</span>${when.includes(' · ') ? `<span class="time">${esc(when.split(' · ').slice(1).join(' · '))}</span>` : ''}</span></label>`).join('\n            ')}
           </fieldset>` : '';
 
   return `<!DOCTYPE html>
@@ -136,13 +140,13 @@ function render(c, offer, offerKey) {
           <h2>${esc(offer.formTitle)}</h2>
           <p class="sub">${esc(offer.formSub)}</p>
         </div>
-        <form action="https://formspree.io/f/${esc(c.FORMSPREE[offerKey])}" method="POST" data-offer="${esc(offerKey)}">
+        <form action="/api/lead" method="POST" data-offer="${esc(offerKey)}">
           ${sessionsHtml}
             ${fieldsHtml}
 
+          <input type="hidden" name="type" value="${esc(offerKey)}">
           <input type="hidden" name="campaign" value="${esc(campaignId)}">
           <input type="hidden" name="source" value="">
-          <input type="hidden" name="_subject" value="${esc(offer.subject(c))}">
 
           <div class="form-honeypot" aria-hidden="true">
             <label for="website_url">Website</label>
@@ -150,8 +154,6 @@ function render(c, offer, offerKey) {
             <label for="_gotcha">Confirm</label>
             <input type="text" id="_gotcha" name="_gotcha" tabindex="-1" autocomplete="off">
           </div>
-
-          <div class="cf-turnstile" data-sitekey="${shared.TURNSTILE_SITEKEY}" data-theme="light" data-size="flexible" data-appearance="interaction-only"></div>
 
           <button type="submit" class="btn btn--primary form-submit">${esc(offer.submitLabel)} <span class="arrow">→</span></button>
           <p class="form-disclaimer">${esc(offer.consent)} See our <a href="/disclaimers.html" target="_blank" rel="noopener">Privacy Policy</a>. Please do not include sensitive financial account information.</p>
@@ -183,7 +185,6 @@ function render(c, offer, offerKey) {
 </footer>
 
 <script>${js}</script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
 </html>
 `;
@@ -198,15 +199,18 @@ function build() {
 
   const seen = new Set();
   const skipped = [];
+  const registry = {}; // -> api/_campaigns.json
   for (const file of files) {
     const c = { ...require(path.join(dir, file)), file };
-    for (const k of ['COMPANY_NAME', 'TICKER', 'FORMSPREE']) if (!c[k]) throw new Error(`${file}: missing ${k}`);
+    for (const k of ['COMPANY_NAME', 'TICKER', 'OFFERS']) if (!c[k]) throw new Error(`${file}: missing ${k}`);
     c.slug = c.SLUG || slugify(c.COMPANY_NAME);
+    // A session is just its date/time string. Teams join links are secrets
+    // and live in the CAMPAIGN_TEAMS_LINKS env var, never in this repo.
+    c.SESSIONS = (c.SESSIONS || []).map((s) => (typeof s === 'string' ? s : s.when));
 
-    for (const [offerKey, formId] of Object.entries(c.FORMSPREE)) {
+    for (const offerKey of c.OFFERS) {
       const offerPath = path.join(__dirname, 'offers', `${offerKey}.js`);
-      if (!fs.existsSync(offerPath)) throw new Error(`${file}: unknown offer "${offerKey}" in FORMSPREE`);
-      if (!formId) throw new Error(`${file}: FORMSPREE.${offerKey} is empty`);
+      if (!fs.existsSync(offerPath)) throw new Error(`${file}: unknown offer "${offerKey}"`);
       const offer = require(offerPath);
       const name = `${c.slug}-${offer.urlSuffix}`;
       if (seen.has(name)) throw new Error(`${file}: duplicate page ${name}`);
@@ -214,11 +218,12 @@ function build() {
 
       // Production guards
       if (offer.showSessions) {
-        if (!(Array.isArray(c.SESSIONS) && c.SESSIONS.length)) throw new Error(`${file}: SESSIONS required for ${offerKey}`);
+        if (!c.SESSIONS.length) throw new Error(`${file}: SESSIONS required for ${offerKey}`);
         if (c.SESSIONS.some((s) => /TBD/i.test(s))) {
           console.warn(`  WARNING /${name}: session dates are TBD`);
           if (IS_PROD) { skipped.push(`${name} (dates TBD)`); continue; }
         }
+        console.warn(`  NOTE /${name}: Teams join links come from CAMPAIGN_TEAMS_LINKS in Vercel (${c.SESSIONS.length} needed)`);
       }
       const pdf = offer.pdf && val(offer.pdf, c);
       if (pdf && !fs.existsSync(path.join(ROOT, pdf))) {
@@ -231,9 +236,21 @@ function build() {
       }
 
       fs.writeFileSync(path.join(OUT, `${name}.html`), render(c, offer, offerKey));
+      registry[name] = {
+        company: c.COMPANY_NAME,
+        ticker: c.TICKER,
+        type: offerKey,
+        ...(offer.showSessions ? { sessions: c.SESSIONS } : {}),
+        ...(pdf ? { pdf } : {}),
+      };
       console.log(`  built /${name}  <- campaigns/${file}`);
     }
   }
+
+  // The form handler only accepts campaigns that were actually built.
+  fs.mkdirSync(path.join(ROOT, 'api'), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, 'api', '_campaigns.json'), JSON.stringify(registry, null, 2) + '\n');
+
   if (skipped.length) console.warn(`  SKIPPED in production: ${skipped.join(', ')}`);
   console.log(`Landing pages: ${seen.size - skipped.length} built.`);
 }
