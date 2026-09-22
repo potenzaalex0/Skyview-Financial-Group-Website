@@ -4,18 +4,9 @@
     "ticker": "JBL",
     "type": "webinar",
     "sessions": [
-      {
-        "when": "Wednesday, October 14, 2026 · 12:00 PM ET",
-        "teams": ""
-      },
-      {
-        "when": "Wednesday, October 14, 2026 · 6:30 PM ET",
-        "teams": ""
-      },
-      {
-        "when": "Tuesday, October 20, 2026 · 12:00 PM ET",
-        "teams": ""
-      }
+      "Wednesday, October 14, 2026 · 12:00 PM ET",
+      "Wednesday, October 14, 2026 · 6:30 PM ET",
+      "Tuesday, October 20, 2026 · 12:00 PM ET"
     ]
   },
   "jabil-equity-compensation-guide": {
@@ -29,18 +20,9 @@
     "ticker": "ROP",
     "type": "webinar",
     "sessions": [
-      {
-        "when": "Wednesday, October 28, 2026 · 12:00 PM ET",
-        "teams": ""
-      },
-      {
-        "when": "Wednesday, October 28, 2026 · 6:30 PM ET",
-        "teams": ""
-      },
-      {
-        "when": "Tuesday, November 3, 2026 · 12:00 PM ET",
-        "teams": ""
-      }
+      "Wednesday, October 28, 2026 · 12:00 PM ET",
+      "Wednesday, October 28, 2026 · 6:30 PM ET",
+      "Tuesday, November 3, 2026 · 12:00 PM ET"
     ]
   },
   "roper-equity-compensation-guide": {
