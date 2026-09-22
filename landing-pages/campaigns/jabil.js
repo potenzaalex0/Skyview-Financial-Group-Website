@@ -23,13 +23,11 @@ module.exports = {
   TICKER,
 
   // Webinar session options. Format: 'Day, Month D, YYYY · H:MM PM ET'
-  // >>> DATES TBD. While any session contains "TBD", the webinar page is
-  // >>> built on previews but SKIPPED in production, so it can't go live
-  // >>> with placeholder dates.
+  // Any session containing "TBD" keeps the webinar page off the live site.
   SESSIONS: [
-    'Session 1 · Date and time TBD',
-    'Session 2 · Date and time TBD',
-    'Session 3 · Date and time TBD',
+    'Wednesday, October 14, 2026 · 12:00 PM ET',
+    'Wednesday, October 14, 2026 · 6:30 PM ET',
+    'Tuesday, October 20, 2026 · 12:00 PM ET',
   ],
 
   // One Formspree form per page, so submissions arrive already segmented.
