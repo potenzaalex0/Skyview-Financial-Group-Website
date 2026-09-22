@@ -1,0 +1,52 @@
+{
+  "jabil-equity-compensation-webinar": {
+    "company": "Jabil",
+    "ticker": "JBL",
+    "type": "webinar",
+    "sessions": [
+      {
+        "when": "Wednesday, October 14, 2026 · 12:00 PM ET",
+        "teams": ""
+      },
+      {
+        "when": "Wednesday, October 14, 2026 · 6:30 PM ET",
+        "teams": ""
+      },
+      {
+        "when": "Tuesday, October 20, 2026 · 12:00 PM ET",
+        "teams": ""
+      }
+    ]
+  },
+  "jabil-equity-compensation-guide": {
+    "company": "Jabil",
+    "ticker": "JBL",
+    "type": "guide",
+    "pdf": "/guides/jabil-equity-compensation-guide.pdf"
+  },
+  "roper-equity-compensation-webinar": {
+    "company": "Roper Technologies",
+    "ticker": "ROP",
+    "type": "webinar",
+    "sessions": [
+      {
+        "when": "Wednesday, October 28, 2026 · 12:00 PM ET",
+        "teams": ""
+      },
+      {
+        "when": "Wednesday, October 28, 2026 · 6:30 PM ET",
+        "teams": ""
+      },
+      {
+        "when": "Tuesday, November 3, 2026 · 12:00 PM ET",
+        "teams": ""
+      }
+    ]
+  },
+  "roper-equity-compensation-guide": {
+    "company": "Roper Technologies",
+    "ticker": "ROP",
+    "type": "guide",
+    "pdf": "/guides/roper-equity-compensation-guide.pdf"
+  }
+}
