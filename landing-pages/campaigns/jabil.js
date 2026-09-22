@@ -1,12 +1,12 @@
 /* =====================================================================
    CAMPAIGN CONFIG — one file per company. Builds every page listed in
-   FORMSPREE below (webinar registration and/or PDF guide).
+   OFFERS below (webinar registration and/or PDF guide).
 
    New company every cycle:
      1. Copy this file to campaigns/<company>.js
      2. Change COMPANY_NAME and TICKER
      3. Set SESSIONS once dates are confirmed
-     4. Create two Formspree forms (webinar + guide), paste their IDs below
+     4. Add the Teams join links to CAMPAIGN_TEAMS_LINKS in Vercel
      5. Commit on a branch. Vercel builds the pages automatically.
 
    URLs:  skyviewfg.com/<slug>-equity-compensation-webinar
@@ -22,17 +22,20 @@ module.exports = {
   COMPANY_NAME,
   TICKER,
 
-  // Webinar session options. Format: 'Day, Month D, YYYY · H:MM PM ET'
-  // Any session containing "TBD" keeps the webinar page off the live site.
+  // Webinar sessions, in the order they appear on the page.
+  // The Microsoft Teams join links are NOT here: Vercel serves this repo's
+  // source publicly, so a link in this file could be read without
+  // registering. They live in the CAMPAIGN_TEAMS_LINKS environment variable
+  // in Vercel, one array per campaign, in the same order as this list.
+  // See landing-pages/README.md. Until a link is set, registration still
+  // works: the confirmation says the link follows separately and you get an
+  // email telling you to send it.
   SESSIONS: [
     'Wednesday, October 14, 2026 · 12:00 PM ET',
     'Wednesday, October 14, 2026 · 6:30 PM ET',
     'Tuesday, October 20, 2026 · 12:00 PM ET',
   ],
 
-  // One Formspree form per page, so submissions arrive already segmented.
-  FORMSPREE: {
-    webinar: 'mljdbgbl', // "Webinar LP - Jabil"
-    guide: 'xdekgeor',   // "Guide LP - Jabil"
-  },
+  // Pages to build for this company.
+  OFFERS: ['webinar', 'guide'],
 };
