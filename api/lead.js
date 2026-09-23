@@ -69,11 +69,16 @@ const firstName = (name) => String(name || '').trim().split(/\s+/)[0] || 'there'
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s || '').trim());
 const clean = (s, max) => String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max || 200);
 
-// 'Wednesday, October 14, 2026 · 12:00 PM ET' -> { day, time }
+// 'Wednesday, October 14, 2026 · 12:00 PM ET'
+//   -> { day: 'Wednesday, October 14', date: 'October 14', time: '12:00 PM' }
+// The year is dropped: these sessions are weeks out, and a date without a
+// year reads like a person wrote it.
 function splitSession(when) {
   const parts = String(when || '').split('·');
+  const full = (parts[0] || '').trim().replace(/,\s*\d{4}$/, '');
   return {
-    day: (parts[0] || '').trim(),
+    day: full,
+    date: full.replace(/^[A-Za-z]+,\s*/, ''),
     time: (parts[1] || '').replace(/\bET\b/i, '').trim(),
   };
 }
@@ -116,27 +121,28 @@ async function alertAlex(subject, text) {
 }
 
 // --- email bodies ----------------------------------------------------
+// Deliberately transactional. An earlier version led with "You're registered"
+// and closed with a free offer; Microsoft quarantined it as spam while the two
+// plain internal notifications from the same send landed fine. The offer now
+// belongs in a reminder closer to the session, where it also lands better.
 function webinarEmail(d, campaign, session, link) {
-  const { day, time } = splitSession(session);
+  const { day, date, time } = splitSession(session);
   const join = link
     ? `Join here: ${link}`
     : 'Your joining link follows in a separate email shortly — we are finalizing the room for this session.';
 
   return {
-    subject: `You're registered — ${campaign.company} equity compensation`,
+    subject: `Registration confirmed — ${campaign.company} equity compensation, ${date}`,
     text: `${firstName(d.name)} —
 
-You're registered for ${day} at ${time} Eastern.
+Your registration is confirmed for ${day} at ${time} Eastern.
 
 ${join}
 
-No Microsoft account needed and nothing to download. You won't be seen
-or heard, and you won't see who else is attending — it's a private room.
+No Microsoft account is needed and there is nothing to download. Attendees
+are not visible or audible to one another.
 
-Questions go through the Q&A panel during the session.
-
-Every attendee gets a complimentary written analysis of their own equity
-grants afterward. No cost, no obligation.
+Questions can be submitted through the Q&A panel during the session.
 
 ${SIGNATURE}
 `,
