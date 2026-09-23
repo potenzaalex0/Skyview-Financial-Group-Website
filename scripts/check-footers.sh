@@ -24,6 +24,22 @@ REF="_partials/footer.html"
 #              including a calculator-specific disclaimer that exists nowhere
 #              else on the site. Its .footer-disclosure block and nav links
 #              match the reference; the extra block is intentional.
+#
+#              THIS ENTRY IS THE CORRECT PERMANENT END STATE, NOT UNFINISHED
+#              WORK. nua.html is a calculator, and its second disclosure
+#              paragraph governs the calculator specifically, so it belongs
+#              directly beneath the tool it governs - which is why it sits
+#              INSIDE <footer class="site-footer"> rather than above it.
+#              Articles use the opposite pattern: see
+#              blog/asset-location-strategy.html, which carries its
+#              .article-tax-disclosure above the footer, in the article body.
+#              Two patterns for two different things is not drift.
+#
+#              Do not "normalise" this by moving the block. Moving approved
+#              disclosure markup is exactly the operation that loses a
+#              paragraph, and the only thing gained is one fewer line here.
+#              Reviewed and decided 2026-09-22; deliberately not escalated to
+#              the CCO, because no approved copy changes either way.
 ALLOWLIST="nua.html"
 
 # Extract from the reference the same way as from a page, so a trailing
