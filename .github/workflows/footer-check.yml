@@ -1,0 +1,37 @@
+name: Footer check
+
+# Fails if any page's footer has drifted from _partials/footer.html.
+#
+# Why this exists: the site has no shared template partial, so every page
+# carries its own copy of the footer markup. That is how nine different
+# footer variants accumulated, seventeen of them missing a required
+# disclosure paragraph. scripts/check-footers.sh is the guard against that
+# happening again, but a script nobody remembers to run is not a guard.
+#
+# Runs on pull requests (so drift is caught before it merges) and on pushes
+# to main (so a direct edit to main is still caught, just after the fact).
+
+on:
+  pull_request:
+    paths:
+      - '**.html'
+      - 'scripts/check-footers.sh'
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+      - 'scripts/check-footers.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  footers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every page's footer matches the reference copy
+        run: bash scripts/check-footers.sh
