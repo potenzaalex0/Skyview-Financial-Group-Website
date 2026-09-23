@@ -23,6 +23,7 @@ concurrency:
 jobs:
   submit:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,8 +57,12 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             grep -oE '<loc>[^<]+</loc>' sitemap.xml | sed -E 's#</?loc>##g' > urls.txt
           else
+            # Underscore-prefixed paths are repo-only and never deployed
+            # (_partials/ is excluded by .vercelignore). They are source files,
+            # not URLs, so they must never reach IndexNow.
             git diff --name-only --diff-filter=ACM \
-              "${{ github.event.before }}" "${{ github.sha }}" -- '*.html' > changed.txt || true
+              "${{ github.event.before }}" "${{ github.sha }}" -- '*.html' \
+              | grep -v '^_' > changed.txt || true
             : > urls.txt
             while read -r f; do
               [ -z "$f" ] && continue
@@ -68,9 +73,36 @@ jobs:
               esac
             done < changed.txt
           fi
+
+          # Backstop for the whole class of bug: this job maps changed FILES to
+          # URLs, so any file that is not actually served becomes a bad
+          # submission. Filtering one prefix fixes one instance; verifying that
+          # each candidate is live fixes the class. Retries once because the
+          # Vercel production deploy for this same commit may still be building.
+          #
+          # NOTE: IndexNow deliberately accepts 404/410 as a removal signal.
+          # Dropping non-200 URLs is safe here only because the diff filter
+          # above is ACM, so deletions never reach this list. If D is ever
+          # added, this check has to learn the difference.
+          : > live.txt
+          while read -r u; do
+            [ -z "$u" ] && continue
+            for attempt in 1 2; do
+              CODE="$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 10 "$u" || echo 000)"
+              if [ "$CODE" = "200" ]; then break; fi
+              if [ "$attempt" -lt 2 ]; then sleep 10; fi
+            done
+            if [ "$CODE" = "200" ]; then
+              echo "$u" >> live.txt
+            else
+              echo "SKIP $u (HTTP $CODE) - not live, not submitted."
+            fi
+          done < urls.txt
+          mv live.txt urls.txt
+
           COUNT="$(wc -l < urls.txt | tr -d ' ')"
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
-          echo "Collected $COUNT URL(s)."
+          echo "Collected $COUNT live URL(s)."
           cat urls.txt
 
       - name: Submit to IndexNow
