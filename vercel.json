@@ -15,6 +15,31 @@
   ],
   "redirects": [
     {
+      "source": "/landing-pages/:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/api/_:path*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/vercel.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/package.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/package-lock.json",
+      "destination": "/",
+      "permanent": false
+    },
+    {
       "source": "/images/adv.pdf",
       "destination": "https://adviserinfo.sec.gov/firm/summary/310581",
       "permanent": true

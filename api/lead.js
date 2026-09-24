@@ -5,13 +5,24 @@
    sends the visitor their email through Resend and notifies Alex. The
    contact page is NOT handled here — it stays on Formspree.
 
-   Campaign data (company name, session list, Teams links, PDF path) comes
-   from api/_campaigns.json, which landing-pages/build.js generates from the
-   campaign configs on every deploy. The Teams join links live server-side
-   on purpose: they are never in the page HTML, so a link cannot be picked
-   up without registering.
+   Campaign data (company name, session list, PDF path) comes from
+   api/_campaigns.json, which landing-pages/build.js generates from the
+   campaign configs on every deploy.
 
-   Env: RESEND_API_KEY (added by the Vercel Resend integration).
+   The Teams join links are NOT in that file and not in this repo at all.
+   vercel.json serves the repo root as static output, so anything committed
+   here is readable at a URL — and a join link that can be read without
+   registering is worthless. They come from an environment variable instead,
+   the same place as the API key.
+
+   Env:
+     RESEND_API_KEY        added by the Vercel Resend integration
+     CAMPAIGN_TEAMS_LINKS  {"<campaign-slug>": ["url session 1", "url 2", ...]}
+                           one array per webinar campaign, in the same order
+                           as SESSIONS in that campaign's config. Missing or
+                           wrong-length arrays are ignored, and the
+                           confirmation promises the link separately instead
+                           of sending a wrong one.
    ===================================================================== */
 'use strict';
 
@@ -20,6 +31,25 @@ try {
   CAMPAIGNS = require('./_campaigns.json');
 } catch (e) {
   console.error('[lead] api/_campaigns.json missing — run landing-pages/build.js');
+}
+
+// Teams join links, keyed by campaign slug. See the header.
+let TEAMS = {};
+try {
+  TEAMS = JSON.parse(process.env.CAMPAIGN_TEAMS_LINKS || '{}');
+} catch (e) {
+  console.error('[lead] CAMPAIGN_TEAMS_LINKS is not valid JSON — no join links will be sent');
+}
+
+// Returns '' rather than guessing: a wrong link is worse than a promised one.
+function joinLink(campaignId, campaign, index) {
+  const list = TEAMS[campaignId];
+  if (!Array.isArray(list)) return '';
+  if (list.length !== (campaign.sessions || []).length) {
+    console.error(`[lead] CAMPAIGN_TEAMS_LINKS['${campaignId}'] has ${list.length} links for ${(campaign.sessions || []).length} sessions`);
+    return '';
+  }
+  return String(list[index] || '').trim();
 }
 
 const FROM = 'Alex Potenza | Skyview Financial Group <guides@mail.skyviewfg.com>';
@@ -39,11 +69,16 @@ const firstName = (name) => String(name || '').trim().split(/\s+/)[0] || 'there'
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s || '').trim());
 const clean = (s, max) => String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max || 200);
 
-// 'Wednesday, October 14, 2026 · 12:00 PM ET' -> { day, time }
+// 'Wednesday, October 14, 2026 · 12:00 PM ET'
+//   -> { day: 'Wednesday, October 14', date: 'October 14', time: '12:00 PM' }
+// The year is dropped: these sessions are weeks out, and a date without a
+// year reads like a person wrote it.
 function splitSession(when) {
   const parts = String(when || '').split('·');
+  const full = (parts[0] || '').trim().replace(/,\s*\d{4}$/, '');
   return {
-    day: (parts[0] || '').trim(),
+    day: full,
+    date: full.replace(/^[A-Za-z]+,\s*/, ''),
     time: (parts[1] || '').replace(/\bET\b/i, '').trim(),
   };
 }
@@ -86,27 +121,28 @@ async function alertAlex(subject, text) {
 }
 
 // --- email bodies ----------------------------------------------------
-function webinarEmail(d, campaign, session) {
-  const { day, time } = splitSession(session && session.when);
-  const join = session && session.teams
-    ? `Join here: ${session.teams}`
+// Deliberately transactional. An earlier version led with "You're registered"
+// and closed with a free offer; Microsoft quarantined it as spam while the two
+// plain internal notifications from the same send landed fine. The offer now
+// belongs in a reminder closer to the session, where it also lands better.
+function webinarEmail(d, campaign, session, link) {
+  const { day, date, time } = splitSession(session);
+  const join = link
+    ? `Join here: ${link}`
     : 'Your joining link follows in a separate email shortly — we are finalizing the room for this session.';
 
   return {
-    subject: `You're registered — ${campaign.company} equity compensation`,
+    subject: `Registration confirmed — ${campaign.company} equity compensation, ${date}`,
     text: `${firstName(d.name)} —
 
-You're registered for ${day} at ${time} Eastern.
+Your registration is confirmed for ${day} at ${time} Eastern.
 
 ${join}
 
-No Microsoft account needed and nothing to download. You won't be seen
-or heard, and you won't see who else is attending — it's a private room.
+No Microsoft account is needed and there is nothing to download. Attendees
+are not visible or audible to one another.
 
-Questions go through the Q&A panel during the session.
-
-Every attendee gets a complimentary written analysis of their own equity
-grants afterward. No cost, no obligation.
+Questions can be submitted through the Q&A panel during the session.
 
 ${SIGNATURE}
 `,
@@ -188,12 +224,15 @@ module.exports = async (req, res) => {
   }
 
   let session = null;
+  let link = '';
   if (kind === 'webinar') {
-    session = (campaign.sessions || []).find((s) => s.when === d.session);
-    if (!session) return res.status(400).json({ error: 'Please choose one of the listed sessions.' });
+    const i = (campaign.sessions || []).indexOf(d.session);
+    if (i === -1) return res.status(400).json({ error: 'Please choose one of the listed sessions.' });
+    session = campaign.sessions[i];
+    link = joinLink(d.campaign, campaign, i);
   }
 
-  const visitor = kind === 'webinar' ? webinarEmail(d, campaign, session) : guideEmail(d, campaign);
+  const visitor = kind === 'webinar' ? webinarEmail(d, campaign, session, link) : guideEmail(d, campaign);
 
   // 1. The visitor's email. This is the one that must not fail silently.
   try {
@@ -225,12 +264,14 @@ module.exports = async (req, res) => {
     console.error('[lead] notification failed', err.message);
   }
 
-  if (kind === 'webinar' && session && !session.teams) {
+  if (kind === 'webinar' && !link) {
     await alertAlex(
       `Teams link missing — ${campaign.company} (${d.session})`,
-      `${d.name} registered for ${d.session} but that session has no Teams link in its campaign config,\n` +
-        `so the confirmation went out promising the link separately. Send it by hand and add it to\n` +
-        `landing-pages/campaigns/*.js so the next registration carries it.\n\n` +
+      `${d.name} registered for ${d.session} but there is no join link for that session, so the\n` +
+        `confirmation went out promising it separately. Send it by hand.\n\n` +
+        `To fix it for the next registration, set CAMPAIGN_TEAMS_LINKS in the Vercel project:\n` +
+        `  {"${d.campaign}": [ one URL per session, in page order ]}\n` +
+        `That campaign has ${(campaign.sessions || []).length} sessions. A list of any other length is ignored.\n\n` +
         `Their email: ${d.email}\n`
     );
   }

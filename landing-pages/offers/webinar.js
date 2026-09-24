@@ -31,7 +31,6 @@ module.exports = {
   fields: ['name', 'email', 'phone', 'employer'],
   showSessions: true,
   submitLabel: 'Register',
-  subject: (c) => `Webinar registration: ${c.COMPANY_NAME}`,
   consent: 'By registering, you agree that Skyview Financial Group may contact you by email or phone about this event.',
   disclaimerNoun: 'This presentation',
 

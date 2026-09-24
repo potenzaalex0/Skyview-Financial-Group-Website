@@ -8,17 +8,16 @@ module.exports = {
     name: 'Alex R. Potenza',
     credentials: 'CIMA®, CDFA®',
     title: 'President, Skyview Financial Group',
-    bio: '30 years advising executives on equity compensation.',
+    bio: '25 years advising executives at Merrill Lynch, UBS, and Raymond James.',
     photo: '/assets/lp/alex-r-potenza-320.webp',
   },
 
   TRUST: ['Fee-only', 'Fiduciary', 'Independent', 'Custody at Fidelity and Charles Schwab'],
 
-  // Formspree submissions from the site go to this inbox; shown if a submit fails.
+  // Shown to the visitor if a send fails, and where lead notifications go.
   FALLBACK_EMAIL: 'ajpotenza@skyviewfg.com',
 
   GA4_ID: 'G-Y6W2EPLT4R',
-  TURNSTILE_SITEKEY: '0x4AAAAAAEXJFs8LKyX6rbWM',
 
   // Standard SEC disclosure — same text as the site footer (contact.html).
   // Links removed deliberately: landing pages carry no exits.

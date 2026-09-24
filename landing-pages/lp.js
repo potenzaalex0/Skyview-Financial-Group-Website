@@ -1,8 +1,7 @@
 /* Skyview landing pages — inlined into each generated page at build time.
-   Same Formspree pattern as script.js on the contact page: honeypot check,
-   fetch with Accept: application/json, Turnstile reset on failure.
-   Difference: success shows an in-page confirmation instead of redirecting
-   to /thank-you.html (which carries the full site nav). */
+   Posts the form to /api/lead (our own handler, which emails the visitor
+   through Resend), then shows the confirmation in place. The contact page
+   is separate and still posts to Formspree. */
 (function () {
   'use strict';
   var wrap = document.querySelector('[data-lp-form]');
@@ -10,6 +9,7 @@
   var form = wrap.querySelector('form');
   var status = wrap.querySelector('[data-form-status]');
   var button = form.querySelector('button[type="submit"]');
+  var fallback = wrap.getAttribute('data-fallback-email');
 
   // Traffic source for attribution (utm_source / utm_medium / utm_campaign)
   try {
@@ -19,10 +19,9 @@
     if (src) src.value = parts.length ? parts.join(' / ') : (document.referrer ? 'referral: ' + document.referrer.split('/')[2] : 'direct');
   } catch (e) {}
 
-  function fail() {
-    if (window.turnstile && typeof window.turnstile.reset === 'function') window.turnstile.reset();
+  function fail(message) {
     button.disabled = false;
-    status.textContent = 'Something went wrong. Please email us directly at ' + wrap.getAttribute('data-fallback-email') + '.';
+    status.textContent = message || ('Something went wrong. Please email us at ' + fallback + ' and we will send it straight over.');
     status.classList.add('is-visible');
   }
 
@@ -33,26 +32,33 @@
 
     button.disabled = true;
     status.classList.remove('is-visible');
-    var data = new FormData(form);
 
-    fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+    var data = {};
+    new FormData(form).forEach(function (v, k) { data[k] = v; });
+
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    })
       .then(function (res) {
-        if (!res.ok) return fail();
-        var session = data.get('session') || '';
-        var slot = wrap.querySelector('[data-selected-session]');
-        if (slot) slot.textContent = session;
-        var mail = wrap.querySelector('[data-submitted-email]');
-        if (mail) mail.textContent = data.get('email') || 'your inbox';
-        wrap.classList.add('is-done');
-        wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (typeof gtag === 'function') {
-          gtag('event', 'generate_lead', {
-            lead_type: form.getAttribute('data-offer'),
-            campaign_slug: data.get('campaign'),
-            session_choice: session
-          });
-        }
+        return res.json().catch(function () { return {}; }).then(function (body) {
+          if (!res.ok) return fail(body && body.error);
+          var slot = wrap.querySelector('[data-selected-session]');
+          if (slot) slot.textContent = data.session || '';
+          var mail = wrap.querySelector('[data-submitted-email]');
+          if (mail) mail.textContent = data.email || 'your inbox';
+          wrap.classList.add('is-done');
+          wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (typeof gtag === 'function') {
+            gtag('event', 'generate_lead', {
+              lead_type: form.getAttribute('data-offer'),
+              campaign_slug: data.campaign,
+              session_choice: data.session || ''
+            });
+          }
+        });
       })
-      .catch(fail);
+      .catch(function () { fail(); });
   });
 })();
