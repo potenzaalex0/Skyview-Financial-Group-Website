@@ -8,7 +8,7 @@ module.exports = {
     name: 'Alex R. Potenza',
     credentials: 'CIMA®, CDFA®',
     title: 'President, Skyview Financial Group',
-    bio: '30 years advising executives on equity compensation.',
+    bio: '25 years advising executives at Merrill Lynch, UBS, and Raymond James.',
     photo: '/assets/lp/alex-r-potenza-320.webp',
   },
 
