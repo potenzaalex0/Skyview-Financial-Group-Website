@@ -15,7 +15,7 @@ module.exports = {
   // Flip to true once the Resend sending domain is verified and a live test
   // has arrived. Until then production skips guide pages, because the page
   // tells visitors to check their inbox.
-  emailDeliveryLive: false,
+  emailDeliveryLive: true,
 
   title: (c) => `Understanding Your Equity Compensation: A Guide for ${c.COMPANY_NAME} Employees | Skyview Financial Group`,
   description: (c) => `A guide for ${c.COMPANY_NAME} employees. Nine pages on RSUs, stock options, and concentrated positions, plus a worksheet.`,
