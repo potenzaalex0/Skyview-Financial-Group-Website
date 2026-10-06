@@ -114,7 +114,8 @@ One PDF per company, named to match the page:
 | `campaigns/*.js` | Per-company values. The only file you edit per cycle. |
 | `offers/webinar.js` | Webinar copy: headline, agenda, 4-field form, confirmation. |
 | `offers/guide.js` | Guide copy: headline, contents, 2-field form, PDF path. |
-| `shared.js` | Speaker, trust row, SEC disclosure, GA4 ID. Same on every page. |
+| `shared.js` | Speaker, trust row, SEC disclosure. Same on every page. |
+| `analytics.src.js` | Cookie banner + GA4 loader. Built to `/analytics.js` with the ID from Vercel. |
 | `lp.css`, `lp.js` | Styles and form handling, inlined into each page. |
 | `build.js` | Generator. No dependencies. `node landing-pages/build.js` |
 | `../api/lead.js` | Form handler. Sends both emails through Resend. |
@@ -123,11 +124,33 @@ One PDF per company, named to match the page:
 ## Tracking
 
 - Hidden form fields: `campaign` (page slug), `type` (webinar / guide) and
-  `source` (utm_source / utm_medium / utm_campaign, or referrer). All three
-  appear on the notification email.
-- GA4 (`G-Y6W2EPLT4R`): page views plus `generate_lead` on each successful
-  submit, with `lead_type` (webinar / guide), `campaign_slug` and
-  `session_choice`. Mark `generate_lead` as a key event in GA4.
+  `source` (utm_source / utm_medium / utm_campaign / utm_content, or
+  referrer). All appear on the notification email.
+- **GA4 is consent-gated and site-wide.** Every page loads `/analytics.js`.
+  Site pages that still carry the old hardcoded Google tag are switched to
+  the `/analytics.js` loader by `build.js` on every deploy, and a production
+  build fails if any page would load Google before consent. `/analytics.js` is
+  generated on each build from `analytics.src.js` with the Measurement ID
+  taken from the `GA4_MEASUREMENT_ID` env var in Vercel (Production and
+  Preview). Nothing loads from Google until the visitor clicks *Accept* on
+  the cookie banner. Google Signals and ad personalization are off.
+  If the env var is missing the build warns and the site runs with no
+  analytics and no banner.
+- Every campaign page sets `company` (the slug, e.g. `jabil`) and
+  `page_type` (`webinar` / `guide`) on all of its GA4 events, page views
+  included. New campaign files get this automatically.
+- Conversion events, fired only after `/api/lead` returns success:
+  - `webinar_registration` — `company`, `session` (the session text picked),
+    `utm_content`, `registrations` (= 1)
+  - `guide_download` — `company`, `utm_content`, `downloads` (= 1)
+  `registrations` and `downloads` are GA4 custom metrics; with Sessions they
+  drive the *Campaign conversion rate* calculated metric.
+  Both are key events in GA4; `company`, `session`, `page_type` and
+  `utm_content` are registered as event-scoped custom dimensions.
+- Weekly report: GA4 → Explore → **Campaign Funnel**.
+- Debugging: add `?ga_debug=1` to a URL (after accepting cookies) and watch
+  GA4 → Admin → DebugView.
+- Visitors can reopen the banner from any link to `#cookie-settings`.
 
 ## Spam
 
