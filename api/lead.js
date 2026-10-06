@@ -26,6 +26,8 @@
    ===================================================================== */
 'use strict';
 
+const { buildInvite } = require('./_ics');
+
 let CAMPAIGNS = {};
 try {
   CAMPAIGNS = require('./_campaigns.json');
@@ -125,11 +127,14 @@ async function alertAlex(subject, text) {
 // and closed with a free offer; Microsoft quarantined it as spam while the two
 // plain internal notifications from the same send landed fine. The offer now
 // belongs in a reminder closer to the session, where it also lands better.
-function webinarEmail(d, campaign, session, link) {
+function webinarEmail(d, campaign, session, link, hasInvite) {
   const { day, date, time } = splitSession(session);
   const join = link
     ? `Join here: ${link}`
     : 'Your joining link follows in a separate email shortly — we are finalizing the room for this session.';
+  const invite = hasInvite
+    ? "\nThe calendar invite is attached. One click and it's on your calendar with the join link.\n"
+    : '';
 
   return {
     subject: `Registration confirmed — ${campaign.company} equity compensation, ${date}`,
@@ -143,7 +148,7 @@ No Microsoft account is needed and there is nothing to download. Attendees
 are not visible or audible to one another.
 
 Questions can be submitted through the Q&A panel during the session.
-
+${invite}
 ${SIGNATURE}
 `,
   };
@@ -232,7 +237,19 @@ module.exports = async (req, res) => {
     link = joinLink(d.campaign, campaign, i);
   }
 
-  const visitor = kind === 'webinar' ? webinarEmail(d, campaign, session, link) : guideEmail(d, campaign);
+  // Calendar invite for webinar registrations (api/_ics.js). If the session
+  // string can't be parsed, the confirmation still goes out, without it.
+  let invite = null;
+  if (kind === 'webinar') {
+    try {
+      invite = buildInvite({ campaignId: d.campaign, company: campaign.company, session, link });
+    } catch (e) {
+      console.error('[lead] invite build failed', e.message);
+    }
+    if (!invite) console.error('[lead] no calendar invite for session', session);
+  }
+
+  const visitor = kind === 'webinar' ? webinarEmail(d, campaign, session, link, !!invite) : guideEmail(d, campaign);
 
   // 1. The visitor's email. This is the one that must not fail silently.
   try {
@@ -243,6 +260,13 @@ module.exports = async (req, res) => {
       reply_to: REPLY_TO,
       subject: visitor.subject,
       text: visitor.text,
+      ...(invite ? {
+        attachments: [{
+          filename: invite.filename,
+          content: Buffer.from(invite.content, 'utf8').toString('base64'),
+          content_type: 'text/calendar; charset=utf-8; method=PUBLISH',
+        }],
+      } : {}),
     });
   } catch (err) {
     console.error('[lead] send failed', { campaign: d.campaign, kind, email: d.email, err: err.message });

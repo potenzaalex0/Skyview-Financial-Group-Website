@@ -36,6 +36,7 @@ retire a company, delete its campaign file.
 | Reply-to | `ajpotenza@skyviewfg.com` |
 | BCC | `ajpotenza@skyviewfg.com` — compliance archive, on every visitor email |
 | Format | Plain text. No HTML, no images, no tracking pixels. |
+| Calendar invite | Webinar confirmations attach an `.ics` (`api/_ics.js`): session time parsed from the session text, Teams link from `CAMPAIGN_TEAMS_LINKS`, 60 min, reminders 24 h and 15 min before. `METHOD:PUBLISH`, stable UID per session. New companies need nothing extra. |
 
 Env vars: `RESEND_API_KEY` (set by the Vercel Resend integration) and
 `CAMPAIGN_TEAMS_LINKS` (below).
