@@ -17,8 +17,6 @@ module.exports = {
   // Shown to the visitor if a send fails, and where lead notifications go.
   FALLBACK_EMAIL: 'ajpotenza@skyviewfg.com',
 
-  GA4_ID: 'G-Y6W2EPLT4R',
-
   // Standard SEC disclosure — same text as the site footer (contact.html).
   // Links removed deliberately: landing pages carry no exits.
   SEC_DISCLOSURE: [
