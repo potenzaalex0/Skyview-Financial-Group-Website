@@ -11,10 +11,10 @@
   var button = form.querySelector('button[type="submit"]');
   var fallback = wrap.getAttribute('data-fallback-email');
 
-  // Traffic source for attribution (utm_source / utm_medium / utm_campaign)
+  // Traffic source for attribution (utm_source / utm_medium / utm_campaign / utm_content)
   try {
     var q = new URLSearchParams(window.location.search);
-    var parts = ['utm_source', 'utm_medium', 'utm_campaign'].map(function (k) { return q.get(k); }).filter(Boolean);
+    var parts = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].map(function (k) { return q.get(k); }).filter(Boolean);
     var src = form.querySelector('input[name="source"]');
     if (src) src.value = parts.length ? parts.join(' / ') : (document.referrer ? 'referral: ' + document.referrer.split('/')[2] : 'direct');
   } catch (e) {}
@@ -50,12 +50,18 @@
           if (mail) mail.textContent = data.email || 'your inbox';
           wrap.classList.add('is-done');
           wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          if (typeof gtag === 'function') {
-            gtag('event', 'generate_lead', {
-              lead_type: form.getAttribute('data-offer'),
-              campaign_slug: data.campaign,
-              session_choice: data.session || ''
-            });
+          // Conversion event: only reached when /api/lead returned 2xx.
+          // company comes from the page (set by build.js); utm_content is
+          // added by analytics.js. registrations / downloads = 1 feed the
+          // GA4 custom metrics used by the Campaign Funnel report. No-op if the visitor declined cookies.
+          if (typeof window.skyviewTrack === 'function') {
+            var page = window.SKYVIEW_PAGE || {};
+            var offer = form.getAttribute('data-offer');
+            if (offer === 'webinar') {
+              window.skyviewTrack('webinar_registration', { company: page.company, session: data.session, registrations: 1 });
+            } else if (offer === 'guide') {
+              window.skyviewTrack('guide_download', { company: page.company, downloads: 1 });
+            }
           }
         });
       })
