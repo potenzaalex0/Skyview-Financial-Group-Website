@@ -66,6 +66,7 @@ p{color:var(--slate-700)}
 .lp-section h2{margin-top:16px}
 
 /* Agenda */
+.agenda-intro{margin-top:16px;max-width:60ch;color:var(--slate-700);line-height:1.7}
 .agenda{margin-top:28px;border-top:1px solid var(--line)}
 .agenda li{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:20px 0;border-bottom:1px solid var(--line)}
 .agenda .num{font-family:var(--serif);font-size:1.6rem;line-height:1;color:var(--brand-blue);font-style:italic}
