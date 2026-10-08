@@ -27,7 +27,7 @@ module.exports = {
 
   agendaEyebrow: 'Agenda',
   agendaTitle: 'What we will cover',
-  agendaIntro: 'Most people accumulate equity one grant at a time and never see all of it in one place. The decisions that matter — when to exercise, when to sell, how much to hold — all have deadlines attached. This hour is about the ones still open before December 31.',
+  agendaIntro: 'A financial planning session on equity compensation, including how to avoid overpaying taxes, and tax planning strategies.',
   agenda: (c) => [
     'Restricted Stock Units, Non-Qualified Stock Options, and Incentive Stock Options',
     'The withholding gap on RSU vesting, and the tax bill it creates in April',
