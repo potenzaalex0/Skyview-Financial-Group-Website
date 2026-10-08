@@ -9,13 +9,25 @@ module.exports = {
   title: (c) => `Equity Compensation Webinar for ${c.COMPANY_NAME} Employees | Skyview Financial Group`,
   description: (c) => `A complimentary one-hour webinar on RSUs, stock options, and concentrated ${c.TICKER} positions. Every attendee receives a written analysis of their own equity grants.`,
 
-  eyebrow: 'Complimentary webinar',
+  // "Live webinar · October 14 & 20" — dates come from the campaign's SESSIONS.
+  eyebrow: (c) => {
+    const days = [];
+    (c.SESSIONS || []).forEach((x) => {
+      const m = x.match(/,[ ]*([A-Za-z]+) ([0-9]{1,2}),/);
+      if (m && !days.some((d) => d[0] === m[1] && d[1] === m[2])) days.push([m[1], m[2]]);
+    });
+    if (!days.length) return 'Live webinar';
+    const parts = days.map((d, i) => (i > 0 && d[0] === days[i - 1][0] ? d[1] : `${d[0]} ${d[1]}`));
+    const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} & ${parts[parts.length - 1]}` : parts[0];
+    return `Live webinar · ${list}`;
+  },
   headline: (c, h) => `Equity Compensation for <em>${h(c.COMPANY_NAME)}</em> Employees`,
-  lead: 'A complimentary one-hour webinar. Every attendee receives a written analysis of their own equity grants.',
+  lead: 'A complimentary one-hour session. All attendees will receive a written analysis of their stock options and restricted stock.',
   heroCta: 'Reserve a seat',
 
   agendaEyebrow: 'Agenda',
   agendaTitle: 'What we will cover',
+  agendaIntro: 'Most people accumulate equity one grant at a time and never see all of it in one place. The decisions that matter — when to exercise, when to sell, how much to hold — all have deadlines attached. This hour is about the ones still open before December 31.',
   agenda: (c) => [
     'Restricted Stock Units, Non-Qualified Stock Options, and Incentive Stock Options',
     'The withholding gap on RSU vesting, and the tax bill it creates in April',
