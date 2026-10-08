@@ -152,7 +152,7 @@ function render(c, offer, offerKey) {
           </div>
 
           <button type="submit" class="btn btn--primary form-submit">${esc(offer.submitLabel)} <span class="arrow">→</span></button>
-          <p class="form-disclaimer">${esc(offer.consent)} See our <a href="/disclaimers.html" target="_blank" rel="noopener">Privacy Policy</a>. Please do not include sensitive financial account information.</p>
+          <p class="form-disclaimer">${esc(offer.consent)} See our <a href="/disclaimers.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
           <p class="form-status" data-form-status role="alert"></p>
         </form>
         <div class="form-success" aria-live="polite">
