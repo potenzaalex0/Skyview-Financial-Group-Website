@@ -17,10 +17,11 @@ module.exports = {
   agendaEyebrow: 'Agenda',
   agendaTitle: 'What we will cover',
   agenda: (c) => [
+    'Restricted Stock Units, Non-Qualified Stock Options, and Incentive Stock Options',
     'The withholding gap on RSU vesting, and the tax bill it creates in April',
-    'When exercising options makes sense, and when waiting costs you',
-    'Managing a concentrated position: 10b5-1 plans, NUA, and 83(b)',
-    `What a change in ${c.TICKER} does to a retirement plan built around it`,
+    'When is the best time to exercise your options?',
+    'Concentrated stock strategies: 83(b) elections, Net Unrealized Appreciation (NUA), and Rule 10b5-1 plans',
+    `How does the movement in ${c.TICKER} stock impact your retirement plan?`,
   ],
 
   showSpeaker: true,
