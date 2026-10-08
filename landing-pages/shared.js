@@ -8,7 +8,7 @@ module.exports = {
     name: 'Alex R. Potenza',
     credentials: 'CIMA®, CDFA®',
     title: 'President, Skyview Financial Group',
-    bio: '25 years advising executives at Merrill Lynch, UBS, and Raymond James.',
+    bio: 'Alex founded Skyview Financial Group after twenty-five years as a financial advisor, and has spent much of that career working with executives on equity compensation and concentrated stock positions.',
     photo: '/assets/lp/alex-r-potenza-320.webp',
   },
 
