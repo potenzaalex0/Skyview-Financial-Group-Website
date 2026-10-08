@@ -98,7 +98,7 @@ function render(c, offer, offerKey) {
       ${LOGO_SVG}
       <span class="brand-text"><span class="brand-name">Skyview</span><span class="brand-sub">Financial Group</span><span class="brand-tag">Registered Investment Advisor</span></span>
     </div>
-    <span class="eyebrow">${esc(offer.eyebrow)}</span>
+    <span class="eyebrow">${esc(val(offer.eyebrow, c))}</span>
     <h1>${offer.headline(c, esc)}</h1>
     <p class="lead">${esc(val(offer.lead, c))}</p>
     <a href="#register" class="btn btn--primary">${esc(offer.heroCta)} <span class="arrow">→</span></a>
@@ -111,6 +111,7 @@ function render(c, offer, offerKey) {
       ${agenda.length ? `<section class="lp-section" aria-labelledby="agenda-h">
         <span class="eyebrow">${esc(offer.agendaEyebrow)}</span>
         <h2 id="agenda-h">${esc(offer.agendaTitle)}</h2>
+        ${offer.agendaIntro ? `<p class="agenda-intro">${esc(val(offer.agendaIntro, c))}</p>` : ''}
         <ol class="agenda">
           ${agenda.map((a, i) => `<li><span class="num">0${i + 1}</span><p>${esc(a)}</p></li>`).join('\n          ')}
         </ol>
