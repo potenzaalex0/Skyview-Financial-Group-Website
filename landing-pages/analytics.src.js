@@ -1,23 +1,27 @@
 /* =====================================================================
-   SITE ANALYTICS + COOKIE CONSENT — source template.
+   SITE ANALYTICS + COOKIE NOTICE — source template.
 
    build.js copies this to /analytics.js on every deploy, replacing
    __GA4_MEASUREMENT_ID__ with the GA4_MEASUREMENT_ID environment variable
    set in Vercel. Every page (site pages and campaign pages) loads
    /analytics.js; nothing else on the site talks to Google directly.
 
-   What it does:
-   1. Shows a consent banner until the visitor chooses. Google Analytics
-      (gtag.js) is NOT requested and NO cookies are set until they click
-      Accept. Decline = nothing loads, ever, until they change their mind.
-   2. Once accepted: loads GA4 with Google Signals and ad personalization
-      off. The page context (company, page_type) rides on every event.
+   What it does (opt-out model, changed from opt-in on 2026-10-12):
+   1. Loads Google Analytics by default, with Google Signals and ad
+      personalization off. The page context (company, page_type) rides on
+      every event.
+   2. Shows a cookie notice until the visitor chooses. "OK" keeps
+      analytics on and hides the notice. "Decline" stops collection,
+      deletes the _ga cookies, and nothing loads on later visits until
+      they change their mind.
    3. Exposes window.skyviewTrack(name, params) for the campaign forms.
-      It is a no-op without consent.
+      It is a no-op if the visitor declined.
 
-   Visitors can reopen the banner from any link to "#cookie-settings" or any
-   element with a data-cookie-settings attribute. Withdrawing consent
-   deletes the _ga cookies and stops collection.
+   Why opt-out: under opt-in, visitors who ignored the banner were never
+   recorded, so campaign traffic from cold email was invisible.
+
+   Visitors can reopen the notice from any link to "#cookie-settings" or
+   any element with a data-cookie-settings attribute.
 
    Add ?ga_debug=1 to any URL to send events to GA4 DebugView.
    ===================================================================== */
@@ -112,7 +116,7 @@
     return true;
   };
 
-  // ---- banner -------------------------------------------------------
+  // ---- notice -------------------------------------------------------
   var CSS = '' +
     '.sv-consent{position:fixed;left:16px;right:16px;bottom:16px;z-index:2147483000;max-width:640px;margin:0 auto;background:#fff;color:#333;border:1px solid #d9e2ec;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:18px 20px;font:14px/1.5 Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}' +
     '.sv-consent p{margin:0 0 12px}' +
@@ -136,13 +140,13 @@
     bannerEl = document.createElement('div');
     bannerEl.className = 'sv-consent';
     bannerEl.setAttribute('role', 'region');
-    bannerEl.setAttribute('aria-label', 'Cookie consent');
+    bannerEl.setAttribute('aria-label', 'Cookie notice');
     bannerEl.innerHTML =
-      '<p>We use Google Analytics cookies to understand how visitors find and use this site. ' +
-      'They are only set if you accept. We do not use advertising cookies. ' +
+      '<p>This site uses Google Analytics cookies to understand how visitors find and use it. ' +
+      'We do not use advertising cookies. You may decline at any time. ' +
       '<a href="' + POLICY_URL + '">Privacy Policy</a></p>' +
       '<div class="sv-btns"><button type="button" class="sv-decline" data-choice="denied">Decline</button>' +
-      '<button type="button" class="sv-accept" data-choice="granted">Accept analytics</button></div>';
+      '<button type="button" class="sv-accept" data-choice="granted">OK</button></div>';
     bannerEl.addEventListener('click', function (e) {
       var choice = e.target && e.target.getAttribute && e.target.getAttribute('data-choice');
       if (!choice) return;
@@ -156,8 +160,8 @@
 
   function init() {
     var choice = readChoice();
-    if (choice === 'granted') loadGA();
-    else if (choice === null) showBanner();
+    if (choice !== 'denied') loadGA();
+    if (choice === null) showBanner();
     if (window.location.hash === '#cookie-settings') showBanner();
     document.addEventListener('click', function (e) {
       var t = e.target && e.target.closest && e.target.closest('a[href$="#cookie-settings"], [data-cookie-settings]');
