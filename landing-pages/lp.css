@@ -34,13 +34,9 @@ p{color:var(--slate-700)}
 .btn:hover .arrow{transform:translateX(4px)}
 .btn[disabled]{opacity:.6;cursor:wait;transform:none}
 
-/* Brand lockup (same SVG + type as the site header, not a link) */
-.brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:44px;height:44px;flex-shrink:0}
-.brand-text{display:flex;flex-direction:column;line-height:1}
-.brand-name{font-size:24px;font-weight:700;color:var(--white);letter-spacing:-.02em;line-height:1}
-.brand-sub{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand-blue-soft);font-weight:700;margin-top:5px}
-.brand-tag{font-family:var(--serif);font-style:italic;font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+/* Brand lockup: official logo, reversed for the dark hero (not a link) */
+.brand{display:flex;align-items:center}
+.brand-logo{display:block;height:44px;width:auto}
 
 /* Hero — matches .page-hero */
 .lp-hero{background:var(--ink);color:var(--white);position:relative;overflow:hidden;padding:28px 0 56px}
