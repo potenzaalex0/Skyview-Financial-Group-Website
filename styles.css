@@ -1004,14 +1004,6 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
   color: var(--charcoal);
 }
 .faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary::after {
-  content: '+';
-  font-family: var(--sans);
-  font-weight: 300; font-size: 1.6rem;
-  color: var(--brand-blue);
-  transition: transform var(--dur) var(--ease);
-}
-.faq-item[open] summary::after { content: '–'; }
 .faq-item p { margin-top: 14px; color: var(--slate-700); font-size: 15.5px; line-height: 1.75; }
 
 /* =================================================================
