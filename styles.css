@@ -439,12 +439,6 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
 .service-card h3 { font-size: 1.6rem; }
 .service-card p { font-size: 15px; line-height: 1.7; flex: 1; }
 .service-card .text-link { margin-top: 8px; align-self: flex-start; font-size: 12px; }
-/* Closing tile in the homepage services grid: completes the 2-column layout. */
-.service-card--cta { background: var(--ink); color: var(--white); justify-content: center; }
-.service-card--cta:hover { background: var(--ink); }
-.service-card--cta h3 { color: var(--white); }
-.service-card--cta p { color: rgba(255,255,255,0.72); flex: 0 0 auto; }
-.service-card--cta .btn { align-self: flex-start; margin-top: 8px; }
 
 @media (max-width: 720px) {
   .services-grid { grid-template-columns: 1fr; }
