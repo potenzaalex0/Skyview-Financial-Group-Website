@@ -42,9 +42,7 @@ const FIELDS = {
   employer: (c) => ({ id: 'employer', label: 'Employer', type: 'text', auto: 'organization', value: c.COMPANY_NAME }),
 };
 
-const LOGO_SVG = `<svg class="brand-mark" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(40 40)">${
-  [0, 60, 120, 180, 240, 300].map((r, i) => `<g transform="rotate(${r})"><path d="M-9 -26 L0 -16 L9 -26" stroke="${i % 2 ? '#33CCFF' : '#0099FF'}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`).join('')
-}</g></svg>`;
+const LOGO_IMG = '<img class="brand-logo" src="/assets/logo-primary-reversed.svg" alt="Skyview Financial Group" width="196" height="44">';
 
 function render(c, offer, offerKey) {
   const S = shared.SPEAKER;
@@ -95,8 +93,7 @@ function render(c, offer, offerKey) {
 <header class="lp-hero">
   <div class="container">
     <div class="brand" aria-label="Skyview Financial Group">
-      ${LOGO_SVG}
-      <span class="brand-text"><span class="brand-name">Skyview</span><span class="brand-sub">Financial Group</span><span class="brand-tag">Registered Investment Advisor</span></span>
+      ${LOGO_IMG}
     </div>
     <span class="eyebrow">${esc(val(offer.eyebrow, c))}</span>
     <h1>${offer.headline(c, esc)}</h1>
