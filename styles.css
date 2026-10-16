@@ -213,6 +213,28 @@ p { color: var(--slate-700); }
 .nav-primary a:hover, .nav-primary a.is-active { color: var(--charcoal); }
 .nav-primary a:hover::after, .nav-primary a.is-active::after { transform: scaleX(1); }
 
+/* Services dropdown (desktop). Link and toggle are separate controls:
+   "Services" always navigates; the chevron button opens the submenu. */
+.nav-item.has-sub { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+.nav-sub-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; color: var(--slate-700); border-radius: 2px;
+  transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.nav-sub-toggle:hover, .nav-sub-toggle[aria-expanded="true"] { color: var(--charcoal); }
+.nav-sub-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.nav-sub-toggle:focus-visible, .mnav-sub-toggle:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.nav-sub[hidden], .mnav-sub[hidden] { display: none !important; }
+.nav-sub {
+  position: absolute; top: calc(100% + 14px); left: -20px; min-width: 260px;
+  background: var(--white); border: 1px solid var(--line);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
+  padding: 10px 0; z-index: 150;
+}
+.nav-primary .nav-sub a { display: block; padding: 10px 20px; font-size: 14px; white-space: nowrap; }
+.nav-primary .nav-sub a::after { display: none; }
+.nav-primary .nav-sub a:hover, .nav-primary .nav-sub a:focus-visible { background: var(--paper); color: var(--charcoal); }
+
 .header-cta { display: flex; align-items: center; gap: 16px; }
 .header-cta .btn { padding: 12px 22px; font-size: 12px; }
 
@@ -253,6 +275,17 @@ p { color: var(--slate-700); }
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 .mobile-nav .btn { margin-top: 28px; align-self: flex-start; }
+/* Services submenu (mobile drawer) */
+.mobile-nav li.has-sub { display: flex; flex-wrap: wrap; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.mobile-nav li.has-sub > a { flex: 1; border-bottom: 0; }
+.mnav-sub-toggle {
+  width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--white);
+  -webkit-tap-highlight-color: transparent;
+}
+.mnav-sub-toggle svg { display: block; width: 18px; height: 18px; transition: transform var(--dur) var(--ease); }
+.mnav-sub-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.mobile-nav ul.mnav-sub { flex-basis: 100%; margin: 0 0 12px; gap: 0; padding-left: 16px; }
+.mobile-nav ul.mnav-sub a { font-family: var(--sans); font-size: 17px; padding: 10px 0; border-bottom: 0; color: rgba(255,255,255,0.8); }
 
 /* =================================================================
    HERO
