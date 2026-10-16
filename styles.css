@@ -178,6 +178,13 @@ p { color: var(--slate-700); }
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .brand-mark { width: 44px; height: 44px; flex-shrink: 0; }
+/* Official logo (vector, from the brand package). Primary logo on the light
+   header and dark drawer; logo with tagline in the footer, where it is large
+   enough to read. */
+.brand-logo { display: block; height: 40px; width: auto; }
+.mobile-nav .brand-logo { height: 36px; }
+.footer-brand .brand-logo { height: 72px; }
+@media (max-width: 1024px) { .site-header .brand-logo { height: 36px; } }
 .brand-text { display: flex; flex-direction: column; line-height: 1; }
 .brand-name {
   font-family: var(--sans);
