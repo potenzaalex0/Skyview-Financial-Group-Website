@@ -455,14 +455,16 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
 }
 .philosophy .container { position: relative; z-index: 2; }
 .philosophy-grid {
-  display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: start;
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: center;
 }
 .philosophy h2 { color: var(--white); font-weight: 300; }
 .philosophy h2 em { font-style: italic; color: var(--brand-blue-soft); font-weight: 400; }
 .philosophy p { color: rgba(255,255,255,0.78); font-size: 1.05rem; }
 .philosophy p + p { margin-top: 20px; }
 .philosophy .eyebrow { color: var(--brand-blue-soft); margin-bottom: 24px; }
-.philosophy-quote {
+/* Scoped under .philosophy so it outranks `.philosophy p` (which was
+   shrinking the quote to body size). */
+.philosophy .philosophy-quote {
   font-family: var(--serif);
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
   font-style: italic;
@@ -474,7 +476,7 @@ section { padding: clamp(80px, 12vh, 140px) 0; }
 }
 @media (max-width: 900px) {
   .philosophy-grid { grid-template-columns: 1fr; gap: 48px; }
-  .philosophy-quote { padding-left: 24px; }
+  .philosophy .philosophy-quote { padding-left: 24px; }
 }
 
 /* =================================================================
