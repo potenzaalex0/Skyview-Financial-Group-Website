@@ -31,6 +31,37 @@ window.si = window.si || function () { (window.siq = window.siq || []).push(argu
     });
   });
 
+  // Services submenu: separate toggle button (desktop + mobile drawer).
+  // Click/tap or Enter/Space toggles; Escape closes and returns focus;
+  // clicking outside closes the desktop menu. Not hover-dependent.
+  const subToggles = document.querySelectorAll('.nav-sub-toggle, .mnav-sub-toggle');
+  const setOpen = (btn, open) => {
+    const menu = document.getElementById(btn.getAttribute('aria-controls'));
+    if (!menu) return;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menu.hidden = !open;
+  };
+  subToggles.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(btn, btn.getAttribute('aria-expanded') !== 'true');
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    subToggles.forEach((btn) => {
+      if (btn.getAttribute('aria-expanded') === 'true') {
+        setOpen(btn, false);
+        if (btn.closest('.has-sub') && btn.closest('.has-sub').contains(document.activeElement)) btn.focus();
+      }
+    });
+  });
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.nav-sub-toggle[aria-expanded="true"]').forEach((btn) => {
+      if (!btn.closest('.has-sub').contains(e.target)) setOpen(btn, false);
+    });
+  });
+
   // Scroll reveal animation
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((entries) => {

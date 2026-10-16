@@ -156,7 +156,18 @@
     <nav class="nav-primary" aria-label="Primary">
       <a href="/" class="is-active">Home</a>
       <a href="about.html">About</a>
-      <a href="services.html">Services</a>
+      <div class="nav-item has-sub">
+        <a href="/services.html">Services</a>
+        <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub-services" aria-label="Show service pages"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <ul class="nav-sub" id="nav-sub-services" hidden>
+          <li><a href="/services.html">All Services</a></li>
+          <li><a href="/financial-planning.html">Financial Planning</a></li>
+          <li><a href="/investment-management.html">Investment Management</a></li>
+          <li><a href="/retirement-planning-ponte-vedra-beach.html">Retirement Planning</a></li>
+          <li><a href="/tax-aware-strategies.html">Tax-Aware Strategies</a></li>
+          <li><a href="/equity-compensation-planning.html">Equity Compensation Planning</a></li>
+        </ul>
+      </div>
       <a href="who-we-serve.html">Who We Serve</a>
       <a href="blog.html">Blog</a>
       <a href="faq.html">FAQ</a>
@@ -192,7 +203,16 @@
   <ul>
     <li><a href="/">Home</a></li>
     <li><a href="about.html">About</a></li>
-    <li><a href="services.html">Services</a></li>
+    <li class="has-sub"><a href="/services.html">Services</a><button class="mnav-sub-toggle" type="button" aria-expanded="false" aria-controls="mnav-sub-services" aria-label="Show service pages"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <ul class="mnav-sub" id="mnav-sub-services" hidden>
+        <li><a href="/services.html">All Services</a></li>
+        <li><a href="/financial-planning.html">Financial Planning</a></li>
+        <li><a href="/investment-management.html">Investment Management</a></li>
+        <li><a href="/retirement-planning-ponte-vedra-beach.html">Retirement Planning</a></li>
+        <li><a href="/tax-aware-strategies.html">Tax-Aware Strategies</a></li>
+        <li><a href="/equity-compensation-planning.html">Equity Compensation Planning</a></li>
+      </ul>
+    </li>
     <li><a href="who-we-serve.html">Who We Serve</a></li>
     <li><a href="blog.html">Blog</a></li>
     <li><a href="faq.html">FAQ</a></li>
@@ -303,7 +323,7 @@
         </svg>
         <h3>Financial Planning</h3>
         <p>A written, living plan that maps cash flow, savings, debt, insurance, education funding, and goal timing into a coherent strategy. The plan evolves as your life evolves.</p>
-        <a href="services.html#financial-planning" class="text-link">Learn More <span class="arrow">→</span></a>
+        <a href="/financial-planning.html" class="text-link">Learn More <span class="arrow">→</span></a>
       </article>
 
       <article class="service-card reveal">
@@ -314,7 +334,7 @@
         </svg>
         <h3>Investment Management</h3>
         <p>Globally diversified, evidence-based portfolios constructed around your risk tolerance, time horizon, and tax profile — and rebalanced with discipline rather than impulse.</p>
-        <a href="services.html#investment-management" class="text-link">Learn More <span class="arrow">→</span></a>
+        <a href="/investment-management.html" class="text-link">Learn More <span class="arrow">→</span></a>
       </article>
 
       <article class="service-card reveal">
@@ -324,7 +344,7 @@
         </svg>
         <h3>Retirement Planning</h3>
         <p>From accumulation to distribution — Social Security strategy, withdrawal sequencing, Roth conversion analysis, and Medicare coordination — designed to make retirement income durable.</p>
-        <a href="services.html#retirement-planning" class="text-link">Learn More <span class="arrow">→</span></a>
+        <a href="/retirement-planning-ponte-vedra-beach.html" class="text-link">Learn More <span class="arrow">→</span></a>
       </article>
 
       <article class="service-card reveal">
@@ -336,7 +356,7 @@
         </svg>
         <h3>Tax-Aware Strategies</h3>
         <p>We coordinate with your CPA on asset location, tax-loss harvesting, charitable giving structures, and Roth conversions — because what you keep matters as much as what you earn.</p>
-        <a href="services.html#tax-strategies" class="text-link">Learn More <span class="arrow">→</span></a>
+        <a href="/tax-aware-strategies.html" class="text-link">Learn More <span class="arrow">→</span></a>
       </article>
 
     </div>
