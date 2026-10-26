@@ -65,6 +65,11 @@
       "permanent": false
     },
     {
+      "source": "/db-owner-guide",
+      "destination": "/guides/skyview-defined-benefit-guide-for-business-owners.pdf",
+      "permanent": false
+    },
+    {
       "source": "/about-us.html",
       "destination": "/about.html",
       "permanent": true
@@ -259,6 +264,15 @@
     },
     {
       "source": "/guides/skyview-defined-benefit-guide-for-cpas.pdf",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/guides/skyview-defined-benefit-guide-for-business-owners.pdf",
       "headers": [
         {
           "key": "X-Robots-Tag",
