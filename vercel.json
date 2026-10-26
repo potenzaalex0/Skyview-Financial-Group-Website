@@ -55,6 +55,11 @@
       "permanent": true
     },
     {
+      "source": "/db-calculator",
+      "destination": "/db-calculator.html",
+      "permanent": true
+    },
+    {
       "source": "/about-us.html",
       "destination": "/about.html",
       "permanent": true
@@ -209,6 +214,15 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/db-calculator.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     },
