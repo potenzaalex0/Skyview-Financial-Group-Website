@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y6W2EPLT4R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y6W2EPLT4R');
+</script>
+<title>Defined Benefit Plan Calculator | Skyview Financial Group</title>
+<meta name="description" content="Estimate how much an owner-only business could contribute to a defined benefit plan, compared with a SEP, SIMPLE IRA, or solo 401(k), under 2026 IRS limits.">
+<!-- UNLISTED PAGE: reachable by direct link only. Not linked from navigation or
+     any other page, not in sitemap.xml, excluded from IndexNow, and served with
+     X-Robots-Tag: noindex (vercel.json). Keep all four in place. -->
+<meta name="robots" content="noindex, nofollow">
+
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://skyviewfg.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://skyviewfg.com/db-calculator.html">
+<meta property="og:title" content="Defined Benefit Plan Calculator | Skyview Financial Group">
+<meta property="og:description" content="See how much a business owner could contribute to a defined benefit plan under 2026 IRS limits.">
+<meta property="og:site_name" content="Skyview Financial Group">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://skyviewfg.com/assets/og-image.jpg">
+<meta name="twitter:title" content="Defined Benefit Plan Calculator">
+<meta name="twitter:description" content="See how much a business owner could contribute to a defined benefit plan under 2026 IRS limits.">
+
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<style>
+/* =================================================================
+   DEFINED BENEFIT CALCULATOR - page-scoped styles
+   Uses the site design system (styles.css) for header, footer, fonts,
+   tokens and buttons. Patterned on nua.html; everything scoped under .dbc.
+   ================================================================= */
+.dbc { --wash: #F4FBFF; --amber: #B45309; --amber-bg: #FFF8EC; }
+.dbc .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+.dbc-head { padding: clamp(56px, 8vh, 96px) 0 clamp(28px, 4vh, 44px); }
+.dbc-head .eyebrow { margin-bottom: 22px; }
+.dbc-h1 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(2.2rem, 4.6vw, 3.5rem); line-height: 1.08;
+  letter-spacing: -0.02em; color: var(--charcoal); max-width: 20ch;
+}
+.dbc-h1 em { font-style: normal; color: var(--brand-blue); }
+.dbc-lede { margin-top: 22px; max-width: 64ch; font-size: clamp(1.02rem, 1.4vw, 1.16rem); line-height: 1.7; color: var(--slate-700); }
+
+.dbc-body { padding: 0 0 clamp(64px, 9vh, 110px); }
+.dbc-grid { display: grid; grid-template-columns: 366px minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 880px) { .dbc-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.dbc .card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 28px 26px; }
+.dbc .card-title {
+  font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--charcoal);
+  padding-bottom: 14px; margin-bottom: 22px; border-bottom: 2px solid var(--brand-blue);
+}
+
+.dbc .field { margin-bottom: 20px; }
+.dbc .field:last-child { margin-bottom: 0; }
+.dbc .field-label {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 9px;
+}
+.dbc .field-val { font-family: var(--mono); font-weight: 500; font-size: 13px; color: var(--brand-blue); white-space: nowrap; }
+.dbc .hint { font-size: 11.5px; color: var(--slate-500); margin-top: 7px; line-height: 1.5; }
+
+.dbc input[type="text"], .dbc select {
+  width: 100%; padding: 12px 14px; font-family: var(--mono); font-size: 15px; font-weight: 500;
+  color: var(--charcoal); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.dbc input[type="text"]:focus-visible, .dbc select:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; border-color: var(--brand-blue); }
+
+.dbc input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+  background: var(--slate-200); border-radius: 3px; margin: 6px 0; cursor: pointer;
+}
+.dbc input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--brand-blue); border: 3px solid var(--white); box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.dbc input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--brand-blue); border: 3px solid var(--white); box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+.dbc input[type="range"]:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 4px; }
+
+.seg-toggle { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.seg-toggle button {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 11px 8px;
+  border: 0; background: var(--paper); color: var(--slate-700); cursor: pointer;
+}
+.seg-toggle button[aria-pressed="true"] { background: var(--brand-blue); color: var(--white); }
+
+.check-row { display: flex; align-items: flex-start; gap: 11px; }
+.dbc input[type="checkbox"] { width: 20px; height: 20px; flex: none; margin-top: 1px; accent-color: var(--brand-blue); cursor: pointer; }
+.dbc input[type="checkbox"]:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.check-row label { font-size: 13px; font-weight: 600; color: var(--charcoal); cursor: pointer; }
+
+/* ---- Results ---- */
+.results { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.verdict { padding: 4px 2px 2px; }
+.verdict-eyebrow { font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--slate-500); margin-bottom: 12px; }
+.verdict-num { font-family: var(--mono); font-weight: 500; font-size: clamp(2.7rem, 7vw, 4.2rem); line-height: 1; letter-spacing: -0.02em; color: var(--charcoal); }
+.verdict-sub { margin-top: 14px; font-size: 15.5px; line-height: 1.6; color: var(--slate-700); max-width: 54ch; }
+.verdict-sub strong { color: var(--charcoal); font-weight: 700; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
+.stat { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 20px; background: var(--paper); }
+.stat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate-500); }
+.stat-num { font-family: var(--mono); font-weight: 500; font-size: 1.75rem; letter-spacing: -0.01em; color: var(--charcoal); margin-top: 6px; }
+.stat-sub { font-size: 12.5px; line-height: 1.5; color: var(--slate-700); margin-top: 6px; }
+
+.note { border-left: 3px solid var(--brand-blue); background: var(--wash); padding: 14px 18px; font-size: 13.5px; line-height: 1.6; color: var(--slate-700); }
+
+.cmp-title { font-family: var(--serif); font-size: 1.45rem; font-weight: 500; color: var(--charcoal); }
+.cmp-sub { font-size: 13px; color: var(--slate-500); margin: 4px 0 20px; }
+.cmp { display: flex; flex-direction: column; gap: 14px; }
+.cmp-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 96px; gap: 14px; align-items: center; }
+@media (max-width: 520px) { .cmp-row { grid-template-columns: minmax(0, 1fr) 90px; } .cmp-row .cmp-track { grid-column: 1 / -1; order: 3; } }
+.cmp-name { font-size: 13.5px; font-weight: 600; color: var(--charcoal); }
+.cmp-name small { display: block; font-size: 11.5px; font-weight: 400; color: var(--slate-500); }
+.cmp-track { height: 14px; background: var(--slate-100); border-radius: 3px; overflow: hidden; }
+.cmp-fill { height: 100%; background: var(--slate-300); }
+.cmp-row.is-db .cmp-fill { background: var(--brand-blue); }
+.cmp-row.is-combo .cmp-fill { background: var(--charcoal); }
+.cmp-amt { text-align: right; font-family: var(--mono); font-weight: 500; font-size: 14px; color: var(--charcoal); }
+@media (prefers-reduced-motion: no-preference) { .cmp-fill { transition: width 420ms var(--ease); } }
+
+.breakdown { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); }
+.breakdown > summary {
+  padding: 16px 20px; cursor: pointer; list-style: none; font-family: var(--sans); font-weight: 600;
+  font-size: 13px; letter-spacing: 0.04em; color: var(--charcoal);
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+}
+.breakdown > summary::-webkit-details-marker { display: none; }
+.breakdown > summary::after { content: '+'; color: var(--brand-blue); font-size: 1.4rem; font-weight: 300; line-height: 1; }
+.breakdown[open] > summary::after { content: '\2013'; }
+.breakdown[open] > summary { border-bottom: 1px solid var(--line); }
+.breakdown:focus-within > summary { outline: 2px solid var(--brand-blue); outline-offset: -2px; }
+.bd-scroll { overflow-x: auto; }
+.bd-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.bd-table td { padding: 10px 20px; border-top: 1px solid var(--line-soft); color: var(--slate-700); }
+.bd-table td.amt { text-align: right; font-family: var(--mono); color: var(--charcoal); white-space: nowrap; }
+.bd-table td .muted { color: var(--slate-500); font-size: 11.5px; display: block; margin-top: 2px; }
+
+.caveat { border-left: 4px solid var(--amber); background: var(--amber-bg); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 22px 24px; }
+.caveat h3 { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); margin-bottom: 14px; }
+.caveat ul { display: flex; flex-direction: column; gap: 12px; }
+.caveat li { position: relative; padding-left: 18px; font-size: 13.5px; line-height: 1.6; color: var(--slate-700); }
+.caveat li::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 8px; height: 1px; background: var(--amber); }
+.caveat li strong { color: var(--charcoal); font-weight: 600; }
+
+.dbc-cta { background: var(--charcoal); color: var(--white); border-radius: var(--radius-md); padding: clamp(30px, 4vw, 44px); }
+.dbc-cta h3 { font-family: var(--serif); font-weight: 400; color: var(--white); font-size: clamp(1.6rem, 3vw, 2.1rem); margin-bottom: 14px; }
+.dbc-cta p { color: rgba(255,255,255,0.8); max-width: 60ch; font-size: 15px; line-height: 1.65; margin-bottom: 26px; }
+
+.compliance { background: var(--paper-warm); border-top: 1px solid var(--line); padding: 48px 0; }
+.compliance p { font-size: 12.5px; line-height: 1.75; color: var(--slate-500); }
+.compliance p + p { margin-top: 12px; }
+.compliance p strong { color: var(--charcoal); font-weight: 700; }
+
+.dbc a:focus-visible, .dbc button:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 3px; }
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Skyview Financial Group home"><img class="brand-logo" src="/assets/logo-primary.svg" alt="Skyview Financial Group" width="178" height="40"></a>
+    <nav class="nav-primary" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="about.html">About</a>
+      <div class="nav-item has-sub">
+        <a href="/services.html">Services</a>
+        <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="nav-sub-services" aria-label="Show service pages"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <ul class="nav-sub" id="nav-sub-services" hidden>
+          <li><a href="/financial-planning.html">Financial Planning</a></li>
+          <li><a href="/investment-management.html">Investment Management</a></li>
+          <li><a href="/retirement-planning-ponte-vedra-beach.html">Retirement Planning</a></li>
+          <li><a href="/tax-aware-strategies.html">Tax-Aware Strategies</a></li>
+          <li><a href="/equity-compensation-planning.html">Equity Compensation Planning</a></li>
+        </ul>
+      </div>
+      <a href="who-we-serve.html">Who We Serve</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-cta">
+      <a href="contact.html" class="btn btn--primary">Schedule a Call <span class="arrow">→</span></a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" role="dialog" aria-label="Mobile navigation">
+  <div class="mobile-nav-head">
+    <a href="/" class="brand"><img class="brand-logo" src="/assets/logo-primary-reversed.svg" alt="Skyview Financial Group" width="160" height="36"></a>
+    <button class="mobile-nav-close" aria-label="Close menu">×</button>
+  </div>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li class="has-sub"><a href="/services.html">Services</a><button class="mnav-sub-toggle" type="button" aria-expanded="false" aria-controls="mnav-sub-services" aria-label="Show service pages"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <ul class="mnav-sub" id="mnav-sub-services" hidden>
+        <li><a href="/financial-planning.html">Financial Planning</a></li>
+        <li><a href="/investment-management.html">Investment Management</a></li>
+        <li><a href="/retirement-planning-ponte-vedra-beach.html">Retirement Planning</a></li>
+        <li><a href="/tax-aware-strategies.html">Tax-Aware Strategies</a></li>
+        <li><a href="/equity-compensation-planning.html">Equity Compensation Planning</a></li>
+      </ul>
+    </li>
+    <li><a href="who-we-serve.html">Who We Serve</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="contact.html" class="btn btn--primary">Schedule a Call <span class="arrow">→</span></a>
+</div>
+
+<main class="dbc">
+
+  <!-- PAGE HEADING -->
+  <section class="dbc-head">
+    <div class="container">
+      <span class="eyebrow">Defined Benefit Plans</span>
+      <h1 class="dbc-h1">How much could a pension plan let <em>your business</em> set aside?</h1>
+      <p class="dbc-lede">For a business owner with no employees, a defined benefit plan can allow deductible contributions several times larger than a SEP or 401(k). Adjust the inputs to see an estimate under 2026 IRS limits.</p>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section class="dbc-body">
+    <div class="container">
+      <div class="dbc-grid">
+
+        <!-- LEFT: INPUTS -->
+        <form class="card" id="inputs" aria-label="Assumptions" autocomplete="off">
+          <div class="card-title">Your assumptions</div>
+
+          <div class="field">
+            <div class="field-label"><label for="age">Your age</label><span class="field-val num" id="ageVal">52</span></div>
+            <input type="range" id="age" min="30" max="64" step="1" value="52">
+          </div>
+
+          <div class="field">
+            <div class="field-label"><label for="ret">Plan retirement age</label><span class="field-val num" id="retVal">62</span></div>
+            <input type="range" id="ret" min="62" max="70" step="1" value="62" aria-describedby="retHint">
+            <p class="hint" id="retHint">62 is the earliest age the full IRS limit applies.</p>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span id="typeLabel">How you're paid</span></div>
+            <div class="seg-toggle" role="group" aria-labelledby="typeLabel">
+              <button type="button" id="tW2" aria-pressed="true">W-2 salary</button>
+              <button type="button" id="tSE" aria-pressed="false">Self-employed</button>
+            </div>
+            <p class="hint" id="typeHint">S-corp or C-corp owner taking a W-2 salary.</p>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><label for="comp" id="compLabel">Annual W-2 salary</label><span class="field-val num" id="compVal">$360,000</span></div>
+            <input type="text" id="comp" inputmode="numeric" value="360,000">
+          </div>
+
+          <div class="field">
+            <div class="field-label"><label for="fed">Federal tax bracket</label></div>
+            <select id="fed">
+              <option value="24">24%</option>
+              <option value="32">32%</option>
+              <option value="35" selected>35%</option>
+              <option value="37">37%</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><label for="state">State income tax rate</label><span class="field-val num" id="stateVal">0.0%</span></div>
+            <input type="range" id="state" min="0" max="13" step="0.5" value="0" aria-describedby="stateHint">
+            <p class="hint" id="stateHint">Florida has no state income tax. New Jersey's top rates run 8.97% to 10.75%.</p>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><label for="rate">Funding interest rate</label><span class="field-val num" id="rateVal">5.00%</span></div>
+            <input type="range" id="rate" min="4" max="6.5" step="0.25" value="5" aria-describedby="rateHint">
+            <p class="hint" id="rateHint">The rate the plan assumes its assets earn until retirement. A lower rate means larger required contributions. This is a funding assumption, not a projected return.</p>
+          </div>
+
+          <div class="field">
+            <div class="check-row">
+              <input type="checkbox" id="k401" checked>
+              <label for="k401">Pair it with a 401(k): salary deferrals, catch-up, and a 6% profit-sharing contribution</label>
+            </div>
+          </div>
+        </form>
+
+        <!-- RIGHT: RESULTS -->
+        <div class="results" aria-live="polite">
+
+          <div class="verdict">
+            <div class="verdict-eyebrow">Estimated annual defined benefit contribution</div>
+            <div class="verdict-num num" id="dbNum">$0</div>
+            <p class="verdict-sub" id="dbSub"></p>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-label">Estimated tax value of the deduction</div>
+              <div class="stat-num num" id="taxNum">$0</div>
+              <div class="stat-sub" id="taxSub"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Target balance at retirement</div>
+              <div class="stat-num num" id="lumpNum">$0</div>
+              <div class="stat-sub" id="lumpSub"></div>
+            </div>
+          </div>
+
+          <div class="note" id="note" hidden></div>
+
+          <div class="card">
+            <div class="cmp-title">Annual contribution by plan type</div>
+            <p class="cmp-sub">Owner-only contributions for 2026, based on your inputs.</p>
+            <div class="cmp" id="cmp"></div>
+          </div>
+
+          <details class="breakdown">
+            <summary>See how the estimate was calculated</summary>
+            <div class="bd-scroll"><table class="bd-table"><tbody id="bd"></tbody></table></div>
+          </details>
+
+          <div class="caveat">
+            <h3>What this model does not do</h3>
+            <ul>
+              <li><strong>Assumes no employees.</strong> Eligible employees generally must be covered, which changes the cost of the plan.</li>
+              <li><strong>Uses a simplified actuarial method.</strong> An enrolled actuary sets the real contribution each year, usually as a range, using IRS mortality tables and your plan's design.</li>
+              <li><strong>Assumes the plan starts this year</strong> and that you work continuously until the plan retirement age.</li>
+              <li><strong>Caps the contribution at your compensation.</strong> For self-employed owners, the contribution also reduces the earnings it is based on, which this model does not iterate.</li>
+              <li><strong>Defined benefit plans are a commitment.</strong> Contributions are generally required each year, and administration and actuarial fees apply.</li>
+            </ul>
+          </div>
+
+          <div class="dbc-cta">
+            <h3>Get the real number for your business.</h3>
+            <p>We'll look at how a defined benefit plan fits with the rest of your tax and retirement picture, and coordinate with your CPA and a plan actuary on the actual figures.</p>
+            <a href="contact.html" class="btn btn--primary">Talk with Skyview <span class="arrow">→</span></a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLIANCE DISCLOSURE (visible, no interaction) -->
+  <section class="compliance">
+    <div class="container container--narrow">
+      <p><strong>Important:</strong> This tool is educational and hypothetical. It is not individualized tax, legal, or investment advice, and it does not constitute a recommendation to adopt any retirement plan. Results are estimates based on 2026 IRS limits, simplified actuarial assumptions, and the inputs you selected; they are not projections, guarantees, or predictions of actual contributions, deductions, or benefits, and actual results will differ. Tax treatment depends on your specific facts and on current law, which is subject to change. Skyview Financial Group does not prepare or file tax returns. Consult your CPA, attorney, and an enrolled actuary before adopting a plan.</p>
+      <p>2026 limits used: defined benefit annual benefit $290,000; defined contribution annual additions $72,000; elective deferral $24,500; catch-up $8,000 (age 50+) or $11,250 (ages 60 to 63); compensation limit $360,000; SIMPLE deferral $17,000 with catch-up of $4,000 (age 50+) or $5,250 (ages 60 to 63).</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand"><img class="brand-logo" src="/assets/logo-reversed.svg" alt="Skyview Financial Group, Registered Investment Advisor" width="260" height="72"></a>
+        <p>An independent, fee-only Registered Investment Advisor headquartered in Ponte Vedra Beach, Florida — serving Jacksonville, Northeast Florida, and clients nationwide.</p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/skyviewfg/" target="_blank" rel="noopener" aria-label="Skyview Financial Group on Facebook"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="https://www.linkedin.com/company/skyview-financial-group/" target="_blank" rel="noopener" aria-label="Skyview Financial Group on LinkedIn"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col"><h5>Firm</h5><ul><li><a href="/about.html">About Us</a></li><li><a href="/services.html">Services</a></li><li><a href="/who-we-serve.html">Who We Serve</a></li><li><a href="/blog.html">Blog</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li></ul></div>
+      <div class="footer-col"><h5>Account</h5><ul><li><a href="https://digital.fidelity.com/prgw/digital/login/full-page" target="_blank" rel="noopener">Account Access</a></li><li><a href="https://main.yhlsoft.com/auth/users/webportal/skyview" target="_blank" rel="noopener">Skyview Login</a></li><li><a href="/disclaimers.html">Privacy Policy</a></li><li><a href="/disclaimers.html">Disclosures</a></li><li><a href="https://adviserinfo.sec.gov/firm/summary/310581" target="_blank" rel="noopener">Form ADV</a></li></ul></div>
+      <div class="footer-col"><h5>Contact</h5><address class="footer-contact"><strong>Florida</strong>816 A1A North, Suite 205<br>Ponte Vedra Beach, FL 32082<br><br><strong>New Jersey</strong>55 Madison Ave<br>Morristown, NJ 07960<br><br><strong>Reach Us</strong><a href="tel:+18884060444">(888) 406-0444</a><br><a href="mailto:info@skyviewfg.com">info@skyviewfg.com</a></address></div>
+    </div>
+    <div class="footer-disclosure"><p>Skyview Financial Group, LLC is an investment adviser registered with the U.S. Securities and Exchange Commission, located in Ponte Vedra Beach, FL. Investment advisory services are offered through Skyview Financial Group. Custody services provided by Fidelity Brokerage Services LLC and Charles Schwab & Co., Inc., Members <a href="https://www.finra.org/" target="_blank" rel="noopener">FINRA</a>/<a href="https://www.sipc.org/" target="_blank" rel="noopener">SIPC</a>, and/or other qualified custodians. Registration with the SEC or any state securities authority does not imply a certain level of skill or training. Information provided on this website is for general informational and educational purposes only and should not be construed as personalized investment, legal, tax, or accounting advice. Skyview Financial Group, LLC does not provide legal or tax advice.</p><p>Different types of investments involve varying degrees of risk. It should not be assumed that future performance of any specific investment or investment strategy will be profitable. To check the background of Skyview Financial Group, please visit <a href="https://adviserinfo.sec.gov/" target="_blank" rel="noopener">https://adviserinfo.sec.gov/</a>.</p></div>
+    <div class="footer-meta"><span>© <span id="yr">2026</span> Skyview Financial Group, LLC. All rights reserved.</span><span>Ponte Vedra Beach · Morristown · Nationwide</span></div>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script src="script.js" defer></script>
+
+<!-- DEFINED BENEFIT CALCULATOR LOGIC - all computation is client-side; no input is stored or transmitted -->
+<script>
+(function () {
+  "use strict";
+
+  // 2026 IRS limits
+  var L = { dbBenefit: 290000, dc415: 72000, def: 24500, cu50: 8000, cu6063: 11250,
+            comp: 360000, simple: 17000, sCu50: 4000, sCu6063: 5250, ssWage: 184500,
+            lumpRate: 0.055, rothCuWage: 150000 };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var selfEmp = false;
+
+  function fmt(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
+  function parseNum(s) { var n = Number(String(s).replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? n : 0; }
+  function catch401(a) { return a >= 60 && a <= 63 ? L.cu6063 : a >= 50 ? L.cu50 : 0; }
+  function catchSimple(a) { return a >= 60 && a <= 63 ? L.sCu6063 : a >= 50 ? L.sCu50 : 0; }
+
+  // Survival-weighted annuity factor at retirement age x and rate i.
+  // Gompertz mortality (modal age 88, dispersion 10); monthly payments approximated by the -11/24 adjustment.
+  function annuityFactor(x, i) {
+    var m = 88, b = 10, s = 0;
+    for (var t = 0; t < 60; t++) {
+      var p = Math.exp(Math.exp((x - m) / b) * (1 - Math.exp(t / b)));
+      s += p / Math.pow(1 + i, t);
+    }
+    return s - 11 / 24;
+  }
+
+  function calc() {
+    var age = +$("age").value, ret = +$("ret").value;
+    var fed = +$("fed").value / 100, st = +$("state").value / 100, rate = +$("rate").value / 100;
+    var gross = parseNum($("comp").value), with401 = $("k401").checked;
+    var taxRate = fed + st;
+
+    // Plan compensation. Self-employed: net SE earnings less half of SE tax.
+    var planComp = gross, halfSE = 0;
+    if (selfEmp) {
+      var base = gross * 0.9235;
+      halfSE = (Math.min(base, L.ssWage) * 0.124 + base * 0.029) / 2;
+      planComp = Math.max(0, gross - halfSE);
+    }
+    var capped = Math.min(planComp, L.comp);
+    var yrs = Math.max(1, ret - age);
+    var phase = Math.min(1, yrs / 10);
+    var benefit = Math.min(L.dbBenefit, capped) * phase;
+    var af = annuityFactor(ret, L.lumpRate);
+    var lump = benefit * af;
+    var sdd = ((Math.pow(1 + rate, yrs) - 1) / rate) * (1 + rate);
+    var dbLevel = lump / sdd;
+
+    // 401(k) alongside a DB plan: deferral + catch-up + profit sharing limited to 6% of pay.
+    var cuMax = catch401(age);
+    var def = Math.min(L.def, planComp);
+    var cu = Math.min(cuMax, Math.max(0, planComp - def));
+    var ps = Math.max(0, Math.min(0.06 * capped, L.dc415 - def));
+    var k = with401 ? def + cu + ps : 0;
+
+    // Contributions can't realistically exceed what the business pays the owner.
+    var room = Math.max(0, planComp - k);
+    var db = Math.min(dbLevel, room);
+    var combo = db + k;
+    var total = with401 ? combo : db;
+    var rothCu = (with401 && !selfEmp && gross > L.rothCuWage) ? cu : 0;
+    var deductible = total - rothCu;
+
+    // Alternatives (owner only)
+    var erPct = selfEmp ? 0.20 : 0.25;
+    var erBase = Math.min(selfEmp ? gross - halfSE : capped, L.comp);
+    var sep = Math.min(L.dc415, erPct * erBase);
+    var solo = Math.min(L.dc415, def + erPct * erBase) + cu;
+    var sDef = Math.min(L.simple + catchSimple(age), planComp);
+    var simple = sDef + Math.min(0.03 * gross, sDef);
+
+    // Inputs echo
+    $("ageVal").textContent = age;
+    $("retVal").textContent = ret;
+    $("stateVal").textContent = (+$("state").value).toFixed(1) + "%";
+    $("rateVal").textContent = (+$("rate").value).toFixed(2) + "%";
+    $("compVal").textContent = fmt(gross);
+
+    // Headline
+    $("dbNum").textContent = fmt(db);
+    $("dbSub").innerHTML = with401
+      ? "Plus <strong>" + fmt(k) + "</strong> in the 401(k), for <strong>" + fmt(combo) + "</strong> a year in total."
+      : "Level annual contribution over <strong>" + yrs + " years</strong> of funding.";
+    $("taxNum").textContent = fmt(deductible * taxRate);
+    $("taxSub").textContent = "On " + fmt(deductible) + " of deductible contributions at a " + (Math.round(taxRate * 1000) / 10) + "% combined rate.";
+    $("lumpNum").textContent = fmt(lump);
+    $("lumpSub").textContent = "Funds a pension of about " + fmt(benefit) + " a year starting at " + ret + ".";
+
+    // Notes
+    var notes = [];
+    if (yrs < 10) {
+      var full = age + 10;
+      notes.push("With " + yrs + " years until retirement, the pension limit is reduced to " + Math.round(phase * 100) + "% of the maximum." + (full <= 70 ? " A plan retirement age of " + full + " restores the full limit." : ""));
+    }
+    if (dbLevel > db + 1) notes.push("The defined benefit contribution is capped at the compensation left after 401(k) contributions (" + fmt(room) + ").");
+    if (with401 && age >= 60 && age <= 63) notes.push("Ages 60 to 63 get the larger 401(k) catch-up of $11,250.");
+    if (rothCu > 0) notes.push("W-2 wages above $150,000 mean 401(k) catch-ups must be made as Roth, so they are not counted in the deduction.");
+    $("note").hidden = !notes.length;
+    $("note").textContent = notes.join(" ");
+
+    // Comparison bars
+    var rows = [
+      ["SIMPLE IRA", "Deferral + 3% match", simple, ""],
+      ["SEP IRA", (selfEmp ? "20%" : "25%") + " of pay", sep, ""],
+      ["Solo 401(k)", "Deferral + profit sharing", solo, ""],
+      ["Defined benefit", "Pension plan alone", db, "is-db"]
+    ];
+    if (with401) rows.push(["Defined benefit + 401(k)", "Combined", combo, "is-combo"]);
+    var max = Math.max.apply(null, rows.map(function (r) { return r[2]; }).concat([1]));
+    $("cmp").innerHTML = rows.map(function (r) {
+      return '<div class="cmp-row ' + r[3] + '"><div class="cmp-name">' + r[0] + '<small>' + r[1] + '</small></div>' +
+        '<div class="cmp-track"><div class="cmp-fill" style="width:' + (r[2] / max * 100).toFixed(1) + '%"></div></div>' +
+        '<div class="cmp-amt num">' + fmt(r[2]) + '</div></div>';
+    }).join("");
+
+    // Breakdown
+    var bd = [
+      ["Plan compensation", selfEmp ? "net self-employment income less half of SE tax" : "W-2 salary", fmt(planComp)],
+      ["Compensation counted", "2026 limit is $360,000", fmt(capped)],
+      ["Years of funding", "plan retirement age minus current age", String(yrs)],
+      ["Target annual pension at " + ret, "lesser of $290,000 and pay" + (phase < 1 ? ", reduced for under 10 years" : ""), fmt(benefit)],
+      ["Lump-sum factor at " + ret, "5.5% interest with a standard mortality curve", af.toFixed(2)],
+      ["Target lump sum", "pension × factor", fmt(lump)],
+      ["Level annual contribution", "grows to the lump sum at " + (rate * 100).toFixed(2) + "%", fmt(dbLevel)]
+    ];
+    if (with401) bd.push(["401(k) contributions", "deferral / catch-up / profit sharing", fmt(def) + " / " + fmt(cu) + " / " + fmt(ps)]);
+    $("bd").innerHTML = bd.map(function (r) {
+      return '<tr><td>' + r[0] + ' <span class="muted">' + r[1] + '</span></td><td class="amt num">' + r[2] + '</td></tr>';
+    }).join("");
+  }
+
+  function setType(se) {
+    selfEmp = se;
+    $("tW2").setAttribute("aria-pressed", String(!se));
+    $("tSE").setAttribute("aria-pressed", String(se));
+    $("compLabel").textContent = se ? "Net self-employment income" : "Annual W-2 salary";
+    $("typeHint").textContent = se ? "Sole proprietor, single-member LLC, or partner (Schedule C or K-1)." : "S-corp or C-corp owner taking a W-2 salary.";
+    calc();
+  }
+
+  $("tW2").addEventListener("click", function () { setType(false); });
+  $("tSE").addEventListener("click", function () { setType(true); });
+  $("comp").addEventListener("input", function (e) {
+    var n = parseNum(e.target.value);
+    e.target.value = n ? n.toLocaleString("en-US") : "";
+  });
+  $("inputs").addEventListener("input", calc);
+  $("inputs").addEventListener("change", calc);
+  $("inputs").addEventListener("submit", function (e) { e.preventDefault(); });
+  calc();
+})();
+</script>
+</body>
+</html>
