@@ -292,12 +292,6 @@
           </div>
 
           <div class="field">
-            <div class="field-label"><label for="rate">Funding interest rate</label><span class="field-val num" id="rateVal">5.00%</span></div>
-            <input type="range" id="rate" min="4" max="6.5" step="0.25" value="5" aria-describedby="rateHint">
-            <p class="hint" id="rateHint">The rate the plan assumes its assets earn until retirement. A lower rate means larger required contributions. This is a funding assumption, not a projected return.</p>
-          </div>
-
-          <div class="field">
             <div class="check-row">
               <input type="checkbox" id="k401" checked>
               <label for="k401">Pair it with a 401(k): salary deferrals, catch-up, and a 6% profit-sharing contribution</label>
@@ -344,7 +338,7 @@
             <h3>What this model does not do</h3>
             <ul>
               <li><strong>Assumes no employees.</strong> Eligible employees generally must be covered, which changes the cost of the plan.</li>
-              <li><strong>Uses a simplified actuarial method.</strong> An enrolled actuary sets the real contribution each year, usually as a range, using IRS mortality tables and your plan's design.</li>
+              <li><strong>Uses a simplified actuarial method.</strong> The assumptions are calibrated against sample 2026 illustrations from a third-party plan administrator and generally land within about 10% of them. An enrolled actuary sets the real contribution each year, usually as a range, using IRS mortality tables and your plan's design.</li>
               <li><strong>Assumes the plan starts this year</strong> and that you work continuously until the plan retirement age.</li>
               <li><strong>Caps the contribution at your compensation.</strong> For self-employed owners, the contribution also reduces the earnings it is based on, which this model does not iterate.</li>
               <li><strong>Defined benefit plans are a commitment.</strong> Contributions are generally required each year, and administration and actuarial fees apply.</li>
@@ -366,7 +360,7 @@
   <section class="compliance">
     <div class="container container--narrow">
       <p><strong>Important:</strong> This tool is educational and hypothetical. It is not individualized tax, legal, or investment advice, and it does not constitute a recommendation to adopt any retirement plan. Results are estimates based on 2026 IRS limits, simplified actuarial assumptions, and the inputs you selected; they are not projections, guarantees, or predictions of actual contributions, deductions, or benefits, and actual results will differ. Tax treatment depends on your specific facts and on current law, which is subject to change. Skyview Financial Group does not prepare or file tax returns. Consult your CPA, attorney, and an enrolled actuary before adopting a plan.</p>
-      <p>2026 limits used: defined benefit annual benefit $290,000; defined contribution annual additions $72,000; elective deferral $24,500; catch-up $8,000 (age 50+) or $11,250 (ages 60 to 63); compensation limit $360,000; SIMPLE deferral $17,000 with catch-up of $4,000 (age 50+) or $5,250 (ages 60 to 63).</p>
+      <p>2026 limits used: defined benefit annual benefit $290,000; defined contribution annual additions $72,000; elective deferral $24,500; catch-up $8,000 (age 50+) or $11,250 (ages 60 to 63); compensation limit $360,000; SIMPLE deferral $18,100 for employers with 25 or fewer employees, with catch-up of $3,850 (age 50+) or $5,250 (ages 60 to 63).</p>
     </div>
   </section>
 
@@ -403,8 +397,13 @@
 
   // 2026 IRS limits
   var L = { dbBenefit: 290000, dc415: 72000, def: 24500, cu50: 8000, cu6063: 11250,
-            comp: 360000, simple: 17000, sCu50: 4000, sCu6063: 5250, ssWage: 184500,
-            lumpRate: 0.055, rothCuWage: 150000 };
+            comp: 360000, simple: 18100, sCu50: 3850, sCu6063: 5250, ssWage: 184500,
+            rothCuWage: 150000 };
+
+  // Actuarial assumptions, calibrated against sample 2026 third-party administrator illustrations.
+  // Pay-limited benefits are valued at 5.5%; benefits held to the $290,000 dollar limit at 6.5%;
+  // contributions accumulate at 6% until retirement.
+  var A = { payRate: 0.055, dollarRate: 0.065, fundRate: 0.06 };
 
   var $ = function (id) { return document.getElementById(id); };
   var selfEmp = false;
@@ -427,7 +426,7 @@
 
   function calc() {
     var age = +$("age").value, ret = +$("ret").value;
-    var fed = +$("fed").value / 100, st = +$("state").value / 100, rate = +$("rate").value / 100;
+    var fed = +$("fed").value / 100, st = +$("state").value / 100, rate = A.fundRate;
     var gross = parseNum($("comp").value), with401 = $("k401").checked;
     var taxRate = fed + st;
 
@@ -441,9 +440,12 @@
     var capped = Math.min(planComp, L.comp);
     var yrs = Math.max(1, ret - age);
     var phase = Math.min(1, yrs / 10);
+    var payLump = capped * phase * annuityFactor(ret, A.payRate);
+    var dollarLump = L.dbBenefit * phase * annuityFactor(ret, A.dollarRate);
+    var dollarBound = dollarLump < payLump;
     var benefit = Math.min(L.dbBenefit, capped) * phase;
-    var af = annuityFactor(ret, L.lumpRate);
-    var lump = benefit * af;
+    var af = dollarBound ? annuityFactor(ret, A.dollarRate) : annuityFactor(ret, A.payRate);
+    var lump = Math.min(payLump, dollarLump);
     var sdd = ((Math.pow(1 + rate, yrs) - 1) / rate) * (1 + rate);
     var dbLevel = lump / sdd;
 
@@ -474,7 +476,6 @@
     $("ageVal").textContent = age;
     $("retVal").textContent = ret;
     $("stateVal").textContent = (+$("state").value).toFixed(1) + "%";
-    $("rateVal").textContent = (+$("rate").value).toFixed(2) + "%";
     $("compVal").textContent = fmt(gross);
 
     // Headline
@@ -520,9 +521,9 @@
       ["Compensation counted", "2026 limit is $360,000", fmt(capped)],
       ["Years of funding", "plan retirement age minus current age", String(yrs)],
       ["Target annual pension at " + ret, "lesser of $290,000 and pay" + (phase < 1 ? ", reduced for under 10 years" : ""), fmt(benefit)],
-      ["Lump-sum factor at " + ret, "5.5% interest with a standard mortality curve", af.toFixed(2)],
+      ["Lump-sum factor at " + ret, (dollarBound ? "6.5%, the $290,000 dollar limit applies" : "5.5%, the pay-based limit applies") + ", standard mortality curve", af.toFixed(2)],
       ["Target lump sum", "pension × factor", fmt(lump)],
-      ["Level annual contribution", "grows to the lump sum at " + (rate * 100).toFixed(2) + "%", fmt(dbLevel)]
+      ["Level annual contribution", "grows to the lump sum at a 6% funding rate", fmt(dbLevel)]
     ];
     if (with401) bd.push(["401(k) contributions", "deferral / catch-up / profit sharing", fmt(def) + " / " + fmt(cu) + " / " + fmt(ps)]);
     $("bd").innerHTML = bd.map(function (r) {
