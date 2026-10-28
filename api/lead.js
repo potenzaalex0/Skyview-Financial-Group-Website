@@ -54,13 +54,13 @@ function joinLink(campaignId, campaign, index) {
   return String(list[index] || '').trim();
 }
 
-const FROM = 'Alex Potenza | Skyview Financial Group <guides@mail.skyviewfg.com>';
+const FROM = 'Alex J. Potenza | Skyview Financial Group <ajpotenza@mail.skyviewfg.com>';
 const REPLY_TO = 'ajpotenza@skyviewfg.com';
 const ARCHIVE = 'ajpotenza@skyviewfg.com'; // BCC on every visitor email + notifications
 const SITE = 'https://skyviewfg.com';
 
 const SIGNATURE = [
-  'Alex Potenza, CFP®, CPWA®',
+  'Alex J. Potenza, CFP®, CPWA®',
   'Skyview Financial Group',
   '816 A1A North, Suite 205, Ponte Vedra Beach, FL 32082',
   '(888) 406-0444',
