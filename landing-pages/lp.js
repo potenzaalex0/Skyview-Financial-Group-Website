@@ -11,10 +11,26 @@
   var button = form.querySelector('button[type="submit"]');
   var fallback = wrap.getAttribute('data-fallback-email');
 
-  // Traffic source for attribution (utm_source / utm_medium / utm_campaign / utm_content)
+  // Attribution. UTMs from the landing URL (our Instantly links carry
+  // utm_source / utm_medium / utm_campaign / utm_content) are kept in
+  // sessionStorage, so a reload or a visit that loses the query string
+  // still attributes the registration to the email that produced it. They
+  // ride in their own hidden fields and in the combined `source` string.
+  var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'];
+  var STORE = 'skyview_utm:' + window.location.pathname;
+  var utm = {};
   try {
     var q = new URLSearchParams(window.location.search);
-    var parts = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].map(function (k) { return q.get(k); }).filter(Boolean);
+    UTM.forEach(function (k) { if (q.get(k)) utm[k] = q.get(k).slice(0, 100); });
+    if (Object.keys(utm).length) sessionStorage.setItem(STORE, JSON.stringify(utm));
+    else utm = JSON.parse(sessionStorage.getItem(STORE) || '{}') || {};
+  } catch (e) {}
+  UTM.forEach(function (k) {
+    var el = form.querySelector('input[name="' + k + '"]');
+    if (el && utm[k]) el.value = utm[k];
+  });
+  try {
+    var parts = UTM.map(function (k) { return utm[k]; }).filter(Boolean);
     var src = form.querySelector('input[name="source"]');
     if (src) src.value = parts.length ? parts.join(' / ') : (document.referrer ? 'referral: ' + document.referrer.split('/')[2] : 'direct');
   } catch (e) {}
@@ -33,8 +49,12 @@
     button.disabled = true;
     status.classList.remove('is-visible');
 
+    // Checkbox groups (e.g. holdings) send every ticked value as an array.
     var data = {};
-    new FormData(form).forEach(function (v, k) { data[k] = v; });
+    new FormData(form).forEach(function (v, k) {
+      if (form.querySelectorAll('input[type="checkbox"][name="' + k + '"]').length) (data[k] = data[k] || []).push(v);
+      else data[k] = v;
+    });
 
     fetch(form.action, {
       method: 'POST',
@@ -46,6 +66,8 @@
           if (!res.ok) return fail(body && body.error);
           var slot = wrap.querySelector('[data-selected-session]');
           if (slot) slot.textContent = data.session || '';
+          var first = wrap.querySelector('[data-first-name]');
+          if (first) first.textContent = data.first_name ? ', ' + data.first_name : '';
           var mail = wrap.querySelector('[data-submitted-email]');
           if (mail) mail.textContent = data.email || 'your inbox';
           wrap.classList.add('is-done');
@@ -58,9 +80,9 @@
             var page = window.SKYVIEW_PAGE || {};
             var offer = form.getAttribute('data-offer');
             if (offer === 'webinar') {
-              window.skyviewTrack('webinar_registration', { company: page.company, session: data.session, registrations: 1 });
+              window.skyviewTrack('webinar_registration', { company: page.company, session: data.session, utm_content: data.utm_content, registrations: 1 });
             } else if (offer === 'guide') {
-              window.skyviewTrack('guide_download', { company: page.company, downloads: 1 });
+              window.skyviewTrack('guide_download', { company: page.company, utm_content: data.utm_content, downloads: 1 });
             }
           }
         });
