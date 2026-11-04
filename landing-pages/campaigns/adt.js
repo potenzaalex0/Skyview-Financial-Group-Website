@@ -32,8 +32,8 @@ module.exports = {
   // works: the confirmation says the link follows separately and you get an
   // email telling you to send it.
   SESSIONS: [
-    'Tuesday, November 17, 2026 · 1:00 PM ET',
-    'Thursday, November 19, 2026 · 1:00 PM ET',
+    'Monday, November 16, 2026 · 12:00 PM ET',
+    'Wednesday, November 18, 2026 · 1:00 PM ET',
   ],
 
   // Pages to build for this company.
