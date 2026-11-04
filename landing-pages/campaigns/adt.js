@@ -27,13 +27,13 @@ module.exports = {
   // >>> SWAP THE DATES HERE <<<
   // Keep the exact format "Weekday, Month D, YYYY · 1:00 PM ET": the
   // confirmation email and the calendar invite read the date and time out
-  // of this string. Production will not publish this page while either
-  // placeholder is still here (build.js skips it; previews still build).
-  // Then add two Teams links, same order, to CAMPAIGN_TEAMS_LINKS in Vercel
+  // of this string. Production skips the page if a placeholder like
+  // [SESSION DATE 1] is put back.
+  // Add two Teams links, same order, to CAMPAIGN_TEAMS_LINKS in Vercel
   // under "adt-equity-compensation-webinar".
   SESSIONS: [
-    '[SESSION DATE 1] · 1:00 PM ET',
-    '[SESSION DATE 2] · 1:00 PM ET',
+    'Tuesday, November 17, 2026 · 1:00 PM ET',
+    'Thursday, November 19, 2026 · 1:00 PM ET',
   ],
 
   OFFERS: ['webinar'],
@@ -84,10 +84,9 @@ module.exports = {
     notices: [
       'This event is sponsored solely by Skyview Financial Group, LLC and is not affiliated with, endorsed by, or sponsored by ADT Inc. or Thrive Holdings.',
       'Skyview Financial Group has no access to non-public information regarding the transaction. All transaction details referenced are drawn from ADT’s public SEC filings.',
-      // TODO(Alex): the brief was cut off mid-sentence here. Paste the full
-      // approved wording; production will not publish while [CONFIRM WORDING]
-      // is present.
-      'This presentation is for educational purposes and is not tax, legal or investment advice. The treatment of any individual equity award is governed by that [CONFIRM WORDING]',
+      // Ending of this sentence approved by Alex J. on Nov 4, 2026 (the
+      // original brief was cut off after "governed by that").
+      'This presentation is for educational purposes and is not tax, legal or investment advice. The treatment of any individual equity award is governed by that award’s plan documents and grant agreement and by the terms of the merger agreement.',
     ],
 
     successBody: (c, h) =>
