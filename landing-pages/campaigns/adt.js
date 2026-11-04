@@ -38,4 +38,20 @@ module.exports = {
 
   // Pages to build for this company.
   OFFERS: ['webinar'], // no ADT guide PDF yet
+
+  // Same page as MasTec/Roper, with three deal-specific edits that match
+  // ADT Email 1 word for word: a deal sentence under the headline, three
+  // agenda bullets, and the sponsor line. Facts are from ADT's SEC filings
+  // only (Oct 29 8-K and DEFA14A employee FAQ).
+  WEBINAR: {
+    lead: 'On October 29, ADT agreed to be acquired for $10.00 per share in cash, subject to stockholder approval. The deal changes how your stock options, RSUs and PSUs pay out. A complimentary one-hour session. All attendees will receive a written analysis of their stock options and restricted stock.',
+    agenda: () => [
+      'Restricted Stock Units, Performance Stock Units, and stock options, and what happens to each at closing',
+      'The withholding gap on RSU vesting and option cash-outs, and the tax bill it creates in April',
+      'Vested options: how a $10.00 cash-out works, and why your exercise price matters',
+      'ADT stock in your 401(k): the Net Unrealized Appreciation (NUA) decision that may not survive closing',
+      'Unvested awards that convert to cash on their original vesting schedule, and what that means for your retirement plan',
+    ],
+    sponsorLine: 'Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ADT Inc. or Thrive Holdings. Transaction details are drawn from ADT’s public SEC filings.',
+  },
 };
