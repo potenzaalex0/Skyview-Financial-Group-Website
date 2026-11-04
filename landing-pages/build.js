@@ -218,7 +218,6 @@ function render(c, offer, offerKey) {
 
 <footer class="lp-disclosure">
   <div class="container">
-    <address class="firm">${shared.FIRM.map((l) => esc(l)).join('<br>')}</address>
     ${offer.notices
       ? offer.notices.map((n, i) => `<p${i === 0 ? ' class="sponsor"' : ''}>${esc(n)}</p>`).join('\n    ')
       : `<p class="sponsor">Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.</p>`}
