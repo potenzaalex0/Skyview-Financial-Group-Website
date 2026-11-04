@@ -46,12 +46,12 @@ module.exports = {
   WEBINAR: {
     lead: 'On October 29, ADT agreed to be acquired for $10.00 per share in cash, subject to stockholder approval. The deal changes how your stock options, RSUs and PSUs pay out. A complimentary one-hour session. All attendees will receive a written analysis of their stock options and restricted stock.',
     agenda: () => [
-      'Restricted Stock Units, Performance Stock Units, and stock options, and what happens to each at closing',
-      'The withholding gap on RSU vesting and option cash-outs, and the tax bill it creates in April',
-      'Vested options: how a $10.00 cash-out works, and why your exercise price matters',
-      'ADT stock in your 401(k): the Net Unrealized Appreciation (NUA) decision that may not survive closing',
       'Unvested awards that convert to cash on their original vesting schedule, and what that means for your retirement plan',
+      'Restricted Stock Units, Performance Stock Units, and stock options, and what happens to each at closing',
+      'Vested options: how a $10.00 cash-out works, and why your exercise price matters',
+      'Options with an exercise price above $10.00, and what the filings do and do not yet say about them',
+      'The withholding gap on RSU vesting and option cash-outs, and the tax bill it creates in April',
     ],
-    sponsorLine: 'Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ADT Inc. or Thrive Holdings. Transaction details are drawn from ADT’s public SEC filings.',
+    sponsorLine: 'Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ADT Inc. or Thrive Holdings. Transaction details are drawn from ADT’s public SEC filings. Skyview Financial Group has no access to non-public information regarding the transaction.',
   },
 };
