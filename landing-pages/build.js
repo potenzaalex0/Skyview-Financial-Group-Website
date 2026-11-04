@@ -220,7 +220,7 @@ function render(c, offer, offerKey) {
   <div class="container">
     ${offer.notices
       ? offer.notices.map((n, i) => `<p${i === 0 ? ' class="sponsor"' : ''}>${esc(n)}</p>`).join('\n    ')
-      : `<p class="sponsor">Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.</p>`}
+      : `<p class="sponsor">${offer.sponsorLine ? esc(val(offer.sponsorLine, c)) : `Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.`}</p>`}
     <p>${esc(offer.disclaimerNoun)} is educational and is not individualized advice. Skyview Financial Group does not prepare or file tax returns.</p>
     ${shared.SEC_DISCLOSURE.map((p) => `<p>${esc(p)}</p>`).join('\n    ')}
     <p class="copy">© ${new Date().getFullYear()} Skyview Financial Group, LLC. All rights reserved.</p>
