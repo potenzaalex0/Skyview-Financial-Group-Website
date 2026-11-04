@@ -184,8 +184,13 @@ function notification(d, campaign, kind, sessionWhen) {
   ];
   if (kind === 'webinar') {
     lines.push(`Phone: ${d.phone || '—'}`, `Employer: ${d.employer || '—'}`, `Session: ${sessionWhen || '—'}`);
+    if (campaign.holdings) lines.push(`Holds: ${d.holdings.length ? d.holdings.join(', ') : '—'}`);
   }
-  lines.push(`Source: ${d.source || 'direct'}`, `Received: ${new Date().toISOString()}`);
+  lines.push(
+    `Source: ${d.source || 'direct'}`,
+    `UTM: source=${d.utm_source || '—'} medium=${d.utm_medium || '—'} campaign=${d.utm_campaign || '—'} content=${d.utm_content || '—'}`,
+    `Received: ${new Date().toISOString()}`
+  );
   return {
     subject: `${kind === 'webinar' ? 'Webinar registration' : 'Guide request'}: ${campaign.company} — ${d.name}`,
     text: lines.join('\n') + '\n',
@@ -211,20 +216,33 @@ module.exports = async (req, res) => {
 
   const kind = clean(d.type, 20);
   const campaign = CAMPAIGNS[clean(d.campaign, 120)];
+  const holdingsIn = Array.isArray(d.holdings) ? d.holdings : d.holdings ? [d.holdings] : [];
+  const firstIn = clean(d.first_name, 60);
+  const lastIn = clean(d.last_name, 60);
   d = {
     campaign: clean(d.campaign, 120),
-    name: clean(d.name, 120),
+    // Pages with separate first/last name fields send both; older pages send
+    // `name`. Everything downstream uses `name`.
+    name: clean(d.name, 120) || clean(`${firstIn} ${lastIn}`, 120),
+    first_name: firstIn,
+    last_name: lastIn,
     email: clean(d.email, 160).toLowerCase(),
     phone: clean(d.phone, 40),
     employer: clean(d.employer, 120),
     session: clean(d.session, 120),
     source: clean(d.source, 200),
+    utm_source: clean(d.utm_source, 100),
+    utm_medium: clean(d.utm_medium, 100),
+    utm_campaign: clean(d.utm_campaign, 100),
+    utm_content: clean(d.utm_content, 100),
+    // Only values the page actually offers are kept.
+    holdings: holdingsIn.map((h) => clean(h, 40)).filter((h) => ((campaign && campaign.holdings) || []).includes(h)),
   };
 
   if (!campaign || (kind !== 'webinar' && kind !== 'guide') || campaign.type !== kind) {
     return res.status(400).json({ error: 'Unknown campaign.' });
   }
-  if (!d.name || !isEmail(d.email)) {
+  if (!d.name || !isEmail(d.email) || ((d.first_name || d.last_name) && !(d.first_name && d.last_name))) {
     return res.status(400).json({ error: 'Please check your name and email address.' });
   }
 
@@ -275,6 +293,8 @@ module.exports = async (req, res) => {
       `A ${kind} submission came in but the email to the visitor did NOT send.\n\n` +
         `Name: ${d.name}\nEmail: ${d.email}\n` +
         (kind === 'webinar' ? `Session: ${d.session}\nPhone: ${d.phone}\nEmployer: ${d.employer}\n` : '') +
+        (d.holdings.length ? `Holds: ${d.holdings.join(', ')}\n` : '') +
+        `Source: ${d.source || 'direct'} (utm_content=${d.utm_content || '—'})\n` +
         `Page: ${SITE}/${d.campaign}\n\nError: ${err.message}\n\nFollow up with them by hand.\n`
     );
     return res.status(502).json({ error: 'We could not send your email just now. Please email ajpotenza@skyviewfg.com and we will send it straight over.' });

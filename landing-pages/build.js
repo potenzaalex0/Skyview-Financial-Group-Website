@@ -26,7 +26,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'lp');
 const shared = require('./shared');
-const css = fs.readFileSync(path.join(__dirname, 'lp.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*/g, '');
+// lp.css is the base page; lp-campaign.css holds the optional components
+// (background, offer callout, notices, dropdown, multi-select, firm block).
+const css = ['lp.css', 'lp-campaign.css'].map((f) => fs.readFileSync(path.join(__dirname, f), 'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s*/g, '');
 const js = fs.readFileSync(path.join(__dirname, 'lp.js'), 'utf8');
 
 const IS_PROD = process.env.VERCEL_ENV === 'production';
@@ -35,31 +37,63 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const slugify = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 // Every possible form field. Offers pick from this list, in order.
+// An entry in an offer's `fields` is a key ('email') or, to make it
+// optional, { key: 'phone', optional: true }. Everything is required unless
+// marked optional.
 const FIELDS = {
-  name:     (c) => ({ id: 'name', label: 'Full name', type: 'text', auto: 'name' }),
-  email:    (c) => ({ id: 'email', label: 'Email', type: 'email', auto: 'email' }),
-  phone:    (c) => ({ id: 'phone', label: 'Phone', type: 'tel', auto: 'tel' }),
-  employer: (c) => ({ id: 'employer', label: 'Employer', type: 'text', auto: 'organization', value: c.COMPANY_NAME }),
+  name:       (c) => ({ id: 'name', label: 'Full name', type: 'text', auto: 'name' }),
+  first_name: (c) => ({ id: 'first_name', label: 'First name', type: 'text', auto: 'given-name' }),
+  last_name:  (c) => ({ id: 'last_name', label: 'Last name', type: 'text', auto: 'family-name' }),
+  email:      (c) => ({ id: 'email', label: 'Email', type: 'email', auto: 'email' }),
+  phone:      (c) => ({ id: 'phone', label: 'Phone', type: 'tel', auto: 'tel' }),
+  employer:   (c) => ({ id: 'employer', label: 'Employer', type: 'text', auto: 'organization', value: c.COMPANY_NAME }),
+  // Multi-select. Options come from the offer's holdingsOptions.
+  holdings:   (c, o) => ({ id: 'holdings', label: o.holdingsLabel || 'Which do you hold?', type: 'checkboxes', options: o.holdingsOptions || [] }),
 };
+const fieldKey = (f) => (typeof f === 'string' ? f : f.key);
+
+// "[SESSION DATE 1]", "[CONFIRM WORDING]": an unfilled placeholder. Never
+// allowed in production, same as "TBD".
+const PLACEHOLDER = /\[[A-Z0-9 ]{3,}\]/;
+
+// Per-campaign copy overrides: a campaign config may set e.g.
+// WEBINAR: { headline, lead, agenda, ... } to replace any key of
+// offers/webinar.js for that company only. Everything not overridden comes
+// from the offer file, so the page stays the same template.
+function offerFor(c, offerKey, base) {
+  const o = c[offerKey.toUpperCase()];
+  return o ? { ...base, ...o } : base;
+}
 
 const LOGO_IMG = '<img class="brand-logo" src="/assets/logo-primary-reversed.svg" alt="Skyview Financial Group" width="196" height="44">';
 
 function render(c, offer, offerKey) {
-  const S = shared.SPEAKER;
   const url = `https://skyviewfg.com/${c.slug}-${offer.urlSuffix}`;
   const campaignId = `${c.slug}-${offer.urlSuffix}`;
   const agenda = offer.agenda ? offer.agenda(c) : [];
 
-  const fieldsHtml = offer.fields.map((k) => {
-    const f = FIELDS[k](c);
-    return `<div class="form-field"><label for="${f.id}">${f.label}</label><input type="${f.type}" id="${f.id}" name="${f.id}" required autocomplete="${f.auto}"${f.value ? ` value="${esc(f.value)}"` : ''}></div>`;
+  const S = { ...shared.SPEAKER, ...(offer.speaker || {}) };
+  const fieldsHtml = offer.fields.map((entry) => {
+    const f = FIELDS[fieldKey(entry)](c, offer);
+    const optional = typeof entry === 'object' && entry.optional;
+    const label = `${esc(f.label)}${optional ? ' <span class="opt">(optional)</span>' : ''}`;
+    if (f.type === 'checkboxes') {
+      return `<fieldset class="form-field choices"><legend>${label}</legend>${f.options.map((opt) => `<label class="choice"><input type="checkbox" name="${f.id}" value="${esc(opt)}"><span>${esc(opt)}</span></label>`).join('')}</fieldset>`;
+    }
+    return `<div class="form-field"><label for="${f.id}">${label}</label><input type="${f.type}" id="${f.id}" name="${f.id}"${optional ? '' : ' required'} autocomplete="${f.auto}"${f.value ? ` value="${esc(f.value)}"` : ''}></div>`;
   }).join('\n            ');
 
-  const sessionsHtml = offer.showSessions ? `
+  const sessionsHtml = !offer.showSessions ? '' : offer.sessionControl === 'select' ? `
+          <div class="form-field"><label for="session">${esc(offer.sessionLabel || 'Which session?')}</label>
+            <select id="session" name="session" required>
+              <option value="" disabled selected>Choose a session</option>
+              ${c.SESSIONS.map((when) => `<option value="${esc(when)}">${esc(when)}</option>`).join('\n              ')}
+            </select>
+          </div>` : `
           <fieldset class="sessions">
             <legend>Choose a session</legend>
             ${c.SESSIONS.map((when) => `<label class="session"><input type="radio" name="session" value="${esc(when)}" required><span class="when"><span class="day">${esc(when.split(' · ')[0])}</span>${when.includes(' · ') ? `<span class="time">${esc(when.split(' · ').slice(1).join(' · '))}</span>` : ''}</span></label>`).join('\n            ')}
-          </fieldset>` : '';
+          </fieldset>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -105,6 +139,11 @@ function render(c, offer, offerKey) {
 <main class="lp-main">
   <div class="container lp-grid">
     <div class="lp-content">
+      ${offer.background ? `<section class="lp-section" aria-labelledby="background-h">
+        <span class="eyebrow">${esc(offer.background.eyebrow || 'Background')}</span>
+        <h2 id="background-h">${esc(offer.background.title)}</h2>
+        ${offer.background.paragraphs.map((p) => `<p class="body-copy">${esc(p)}</p>`).join('\n        ')}
+      </section>` : ''}
       ${agenda.length ? `<section class="lp-section" aria-labelledby="agenda-h">
         <span class="eyebrow">${esc(offer.agendaEyebrow)}</span>
         <h2 id="agenda-h">${esc(offer.agendaTitle)}</h2>
@@ -112,6 +151,7 @@ function render(c, offer, offerKey) {
         <ol class="agenda">
           ${agenda.map((a, i) => `<li><span class="num">0${i + 1}</span><p>${esc(a)}</p></li>`).join('\n          ')}
         </ol>
+        ${offer.offerNote ? `<div class="offer-note"><span class="label">${esc(offer.offerNote.label || 'For every attendee')}</span><p>${esc(offer.offerNote.text)}</p></div>` : ''}
       </section>` : ''}
       ${offer.showSpeaker ? `<section class="lp-section" aria-labelledby="speaker-h">
         <span class="eyebrow">Your presenter</span>
@@ -123,6 +163,10 @@ function render(c, offer, offerKey) {
             <p class="bio">${esc(S.bio)}</p>
           </div>
         </div>
+      </section>` : ''}
+      ${offer.notices ? `<section class="lp-section notices" aria-labelledby="notices-h">
+        <h2 id="notices-h" class="notices-h">Important information</h2>
+        ${offer.notices.map((n) => `<p>${esc(n)}</p>`).join('\n        ')}
       </section>` : ''}
     </div>
 
@@ -140,6 +184,10 @@ function render(c, offer, offerKey) {
           <input type="hidden" name="type" value="${esc(offerKey)}">
           <input type="hidden" name="campaign" value="${esc(campaignId)}">
           <input type="hidden" name="source" value="">
+          <input type="hidden" name="utm_source" value="">
+          <input type="hidden" name="utm_medium" value="">
+          <input type="hidden" name="utm_campaign" value="">
+          <input type="hidden" name="utm_content" value="">
 
           <div class="form-honeypot" aria-hidden="true">
             <label for="website_url">Website</label>
@@ -170,7 +218,10 @@ function render(c, offer, offerKey) {
 
 <footer class="lp-disclosure">
   <div class="container">
-    <p class="sponsor">Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.</p>
+    <address class="firm">${shared.FIRM.map((l) => esc(l)).join('<br>')}</address>
+    ${offer.notices
+      ? offer.notices.map((n, i) => `<p${i === 0 ? ' class="sponsor"' : ''}>${esc(n)}</p>`).join('\n    ')
+      : `<p class="sponsor">Sponsored solely by Skyview Financial Group, LLC. Not affiliated with, endorsed by, or sponsored by ${esc(c.COMPANY_NAME)}.</p>`}
     <p>${esc(offer.disclaimerNoun)} is educational and is not individualized advice. Skyview Financial Group does not prepare or file tax returns.</p>
     ${shared.SEC_DISCLOSURE.map((p) => `<p>${esc(p)}</p>`).join('\n    ')}
     <p class="copy">© ${new Date().getFullYear()} Skyview Financial Group, LLC. All rights reserved.</p>
@@ -252,7 +303,7 @@ function build() {
     for (const offerKey of c.OFFERS) {
       const offerPath = path.join(__dirname, 'offers', `${offerKey}.js`);
       if (!fs.existsSync(offerPath)) throw new Error(`${file}: unknown offer "${offerKey}"`);
-      const offer = require(offerPath);
+      const offer = offerFor(c, offerKey, require(offerPath));
       const name = `${c.slug}-${offer.urlSuffix}`;
       if (seen.has(name)) throw new Error(`${file}: duplicate page ${name}`);
       seen.add(name);
@@ -260,11 +311,16 @@ function build() {
       // Production guards
       if (offer.showSessions) {
         if (!c.SESSIONS.length) throw new Error(`${file}: SESSIONS required for ${offerKey}`);
-        if (c.SESSIONS.some((s) => /TBD/i.test(s))) {
-          console.warn(`  WARNING /${name}: session dates are TBD`);
+        if (c.SESSIONS.some((s) => /TBD/i.test(s) || PLACEHOLDER.test(s))) {
+          console.warn(`  WARNING /${name}: session dates are TBD / placeholders`);
           if (IS_PROD) { skipped.push(`${name} (dates TBD)`); continue; }
         }
         console.warn(`  NOTE /${name}: Teams join links come from CAMPAIGN_TEAMS_LINKS in Vercel (${c.SESSIONS.length} needed)`);
+      }
+      const unfilled = (offer.notices || []).filter((n) => PLACEHOLDER.test(n));
+      if (unfilled.length) {
+        console.warn(`  WARNING /${name}: ${unfilled.length} disclaimer(s) still contain a placeholder`);
+        if (IS_PROD) { skipped.push(`${name} (disclaimer placeholder)`); continue; }
       }
       const pdf = offer.pdf && val(offer.pdf, c);
       if (pdf && !fs.existsSync(path.join(ROOT, pdf))) {
@@ -282,6 +338,7 @@ function build() {
         ticker: c.TICKER,
         type: offerKey,
         ...(offer.showSessions ? { sessions: c.SESSIONS } : {}),
+        ...(offer.fields.some((f) => fieldKey(f) === 'holdings') ? { holdings: offer.holdingsOptions || [] } : {}),
         ...(pdf ? { pdf } : {}),
       };
       console.log(`  built /${name}  <- campaigns/${file}`);

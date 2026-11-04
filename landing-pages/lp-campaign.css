@@ -1,0 +1,23 @@
+/* Campaign page components that only render when a campaign config
+   switches them on. Concatenated after lp.css by build.js. */
+/* Optional sections a campaign can switch on (background, offer, notices) */
+.body-copy{margin-top:16px;max-width:62ch;line-height:1.75}
+.offer-note{margin-top:28px;padding:20px 22px;border-left:3px solid var(--brand-blue);background:rgba(0,153,255,.05)}
+.offer-note .label{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-blue)}
+.offer-note p{margin-top:6px;color:var(--charcoal);font-size:1.02rem}
+.notices{padding:24px;background:var(--white);border:1px solid var(--line)}
+.notices .notices-h{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--slate-500);margin:0}
+.notices p{font-size:14px;line-height:1.65;color:var(--charcoal);margin-top:12px}
+
+/* Form: optional marker, session dropdown, multi-select checkboxes */
+.form-field .opt{text-transform:none;letter-spacing:0;font-weight:400}
+.form-field select{width:100%;padding:14px 40px 14px 16px;border:1px solid var(--line);background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23333' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;font-family:var(--sans);font-size:16px;color:var(--charcoal);border-radius:var(--radius-sm);appearance:none;-webkit-appearance:none;transition:border-color var(--dur) var(--ease)}
+.form-field select:focus{outline:none;border-color:var(--brand-blue)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choices legend{grid-column:1/-1;margin-bottom:2px}
+.form-field .choice{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);background:var(--paper);border-radius:var(--radius-sm);cursor:pointer;font-size:14.5px;color:var(--charcoal);text-transform:none;letter-spacing:0;font-weight:400}
+.choice input{width:16px;height:16px;accent-color:var(--brand-blue);flex-shrink:0;margin:0}
+.choice:has(input:checked){border-color:var(--brand-blue);background:rgba(0,153,255,.05)}
+
+/* Footer firm block */
+.lp-disclosure .firm{font-style:normal;font-size:13px;line-height:1.7;color:rgba(255,255,255,.82);margin-bottom:20px}

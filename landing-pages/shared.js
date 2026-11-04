@@ -12,6 +12,10 @@ module.exports = {
     photo: '/assets/lp/alex-r-potenza-320.webp',
   },
 
+  // Firm details, in the footer of every campaign page (form and
+  // confirmation states alike: the footer sits outside the form card).
+  FIRM: ['Skyview Financial Group, LLC', '816 A1A North, Suite 205, Ponte Vedra Beach, FL 32082', '(888) 406-0444'],
+
   TRUST: ['Fee-only', 'Fiduciary', 'Independent', 'Custody at Fidelity and Charles Schwab'],
 
   // Shown to the visitor if a send fails, and where lead notifications go.
