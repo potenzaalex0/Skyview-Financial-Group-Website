@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- Paid social funnel for executives with concentrated stock. Ad traffic only: noindex, not in the sitemap.
+     Form posts to /api/qualify, which decides fit server side, emails the visitor and sends Alex a pre-call briefing.
+     Qualified visitors book in the TidyCal embed (set data-tidycal on #qcard below). -->
+<script>window.SKYVIEW_PAGE = { company: 'concentrated-stock', page_type: 'qualifier' };</script>
+<script src="/analytics.js" defer></script>
+<title>A plan for your company stock | Skyview Financial Group</title>
+<meta name="description" content="A 30 minute call with a CFP® and CPWA® advisor about your grants, your tax picture and a realistic schedule for diversifying company stock.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0099FF;--sky:#33CCFF;--ink:#333333;--blue-ink:#0077cc;--bg:#fff;--surface:#f3f7fb;--line:#d9e2ec;--muted:#5b6670;--warn:#a35a00;
+  --font:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--blue-ink)}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:20px;padding-right:20px}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:16px;padding-bottom:16px}
+.top img{height:38px;width:auto;display:block}
+.top span{font-size:13px;color:var(--muted)}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;padding-top:56px;padding-bottom:64px;align-items:start}
+h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font-weight:800;margin:0 0 20px}
+.lede{font-size:19px;color:var(--muted);max-width:34em;margin:0 0 28px}
+.points{margin:0;padding:0;list-style:none;display:grid;gap:12px;max-width:34em}
+.points li{padding-left:28px;position:relative}
+.points li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:6px;border-radius:3px;background:var(--blue)}
+.meter{margin:36px 0 0;max-width:34em}
+.meter-bar{display:flex;height:22px;border-radius:11px;overflow:hidden;background:var(--surface);border:1px solid var(--line)}
+.meter-one{width:40%;background:var(--blue);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.meter-rest{flex:1;background:repeating-linear-gradient(90deg,var(--sky) 0 6px,transparent 6px 9px);opacity:.55}
+.meter-cap{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+@media (prefers-reduced-motion:reduce){.meter-one{transition:none}}
+.card{border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 18px 40px -24px rgba(0,60,110,.35);background:var(--bg)}
+.prog{display:flex;gap:6px;margin-bottom:22px}
+.prog span{height:4px;flex:1;border-radius:2px;background:var(--line)}
+.prog span.done{background:var(--blue)}
+.count{font-size:13px;color:var(--muted);margin:0 0 6px}
+.card h2{font-size:22px;line-height:1.25;letter-spacing:-.01em;margin:0 0 6px}
+.help{color:var(--muted);font-size:15px;margin:0 0 18px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:13px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer;font-size:16px}
+.opt:hover{border-color:var(--sky)}
+.opt[aria-pressed="true"]{border-color:var(--blue);background:#eef7ff}
+.opt .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--muted);flex:none;display:grid;place-items:center}
+.opt.radio .box{border-radius:50%}
+.opt[aria-pressed="true"] .box{background:var(--blue);border-color:var(--blue)}
+.opt[aria-pressed="true"] .box::after{content:"";width:8px;height:4px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.fields{display:grid;gap:12px}
+.fields label{display:grid;gap:4px;font-size:14px;font-weight:600}
+.fields input,.fields select{font:inherit;font-weight:400;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields .chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:13.5px;color:var(--muted)}
+.chk input{margin-top:3px;width:18px;height:18px;flex:none}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:13px 20px;font-weight:700;cursor:pointer;font-size:16px}
+.btn[disabled]{opacity:.5;cursor:wait}
+.link{background:none;border:0;color:var(--blue-ink);cursor:pointer;padding:6px 0;font-weight:600}
+.err{color:var(--warn);font-size:14px;margin:10px 0 0;min-height:1em}
+.fine{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}
+.tidycal-wrap{min-height:540px;margin:0 -12px}
+.band{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:56px 0}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.cols h3{font-size:18px;margin:0 0 8px}
+.cols p{margin:0;color:var(--muted)}
+.team{padding-top:56px;padding-bottom:56px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.team h2{grid-column:1/-1;font-size:28px;letter-spacing:-.02em;margin:0}
+.team h3{margin:0;font-size:19px}
+.cred{color:var(--blue-ink);font-weight:600;font-size:14px;margin:2px 0 10px}
+.team p{margin:0;color:var(--muted)}
+.disc{border-top:1px solid var(--line);padding-top:28px;padding-bottom:48px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.disc p{margin:0 0 10px}
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:28px;padding-top:28px}
+  .points,.meter{display:none}
+  .lede{font-size:17px;margin-bottom:0}
+  .cols,.team,.row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <img src="/assets/logo-primary.svg" alt="Skyview Financial Group" width="166" height="38">
+  <span>Fee only fiduciary RIA</span>
+</div></header>
+
+<main>
+<div class="wrap hero">
+  <div>
+    <h1>Most of your net worth is in one stock. Here is how to plan the way out.</h1>
+    <p class="lede">A 30 minute call with a CFP® and CPWA® advisor to look at your grants, your tax picture and a realistic schedule for diversifying.</p>
+    <ul class="points">
+      <li>Which shares to sell first, based on cost basis, holding period and vest schedule</li>
+      <li>What the tax bill looks like this year and next, before you sell anything</li>
+      <li>Whether a 10b5-1 plan, exchange fund or charitable strategy makes sense for you</li>
+    </ul>
+    <div class="meter" aria-live="polite">
+      <div class="meter-bar"><div class="meter-one" id="meterOne"></div><div class="meter-rest"></div></div>
+      <div class="meter-cap"><span id="meterLabel">Your company stock</span><span>Everything else</span></div>
+    </div>
+  </div>
+
+  <!-- data-tidycal: the TidyCal booking path, e.g. "ajpotenza/stock-review-30". Empty = no embed; qualified visitors are told we will call. -->
+  <div class="card" id="qcard" aria-live="polite" data-tidycal="" data-fallback-email="ajpotenza@skyviewfg.com"></div>
+</div>
+
+<section class="band"><div class="wrap cols">
+  <div><h3>What we look at</h3><p>Your RSU, option and ESPP history, current holdings, cost basis and the next 24 months of vests.</p></div>
+  <div><h3>What you leave with</h3><p>A short summary of your concentration risk, an estimated tax range for diversifying, and two or three paths to consider.</p></div>
+  <div><h3>What it costs</h3><p>Nothing. We are a fee only fiduciary. We do not sell products or earn commissions.</p></div>
+</div></section>
+
+<section class="wrap team">
+  <h2>Who you will meet</h2>
+  <div><h3>Alex R. Potenza</h3><p class="cred">CIMA®, CDFA®, President</p>
+    <p>Twenty-five years as a financial advisor, including Merrill Lynch, UBS Financial Services and Raymond James, much of it working with executives on equity compensation and concentrated stock.</p></div>
+  <div><h3>Alex J. Potenza</h3><p class="cred">CFP®, CPWA®, Vice President</p>
+    <p>Leads financial planning at Skyview, with a focus on equity compensation, tax planning and retirement income.</p></div>
+</section>
+</main>
+
+<footer class="wrap disc">
+  <p>Skyview Financial Group, LLC is an investment adviser registered with the U.S. Securities and Exchange Commission, located in Ponte Vedra Beach, FL. Investment advisory services are offered through Skyview Financial Group. Custody services provided by Fidelity Brokerage Services LLC and Charles Schwab &amp; Co., Inc., Members FINRA/SIPC, and/or other qualified custodians. Registration with the SEC or any state securities authority does not imply a certain level of skill or training. Information provided on this website is for general informational and educational purposes only and should not be construed as personalized investment, legal, tax, or accounting advice. Skyview Financial Group, LLC does not provide legal or tax advice.</p>
+  <p>Different types of investments involve varying degrees of risk. It should not be assumed that future performance of any specific investment or investment strategy will be profitable. To check the background of Skyview Financial Group, please visit adviserinfo.sec.gov. <a href="/disclaimers.html#privacy-disclosures">Privacy</a> · <a href="#cookie-settings">Cookie settings</a></p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  // Keep option text identical to api/qualify.js: the server only accepts these exact values.
+  var STEPS = [
+    { id: 'intent', q: 'Are you looking to put a plan in place for your company stock in the next few months?', help: 'Be honest. If not, we will send you our reading list instead of booking a call.',
+      opts: ['Yes, I want to talk this through soon', 'Not yet, I am just learning'] },
+    { id: 'holdings', multi: true, q: 'What kind of company stock do you hold?', help: 'Pick all that apply.',
+      opts: ['RSUs (vested or unvested)', 'Stock options (ISOs or NQSOs)', 'ESPP shares', 'Restricted stock or founder shares', 'Shares from a past grant or IPO'] },
+    { id: 'conc', q: 'Roughly how much of your net worth is in that one company?', help: 'A best guess is fine.',
+      opts: ['Under 10%', '10% to 25%', '25% to 50%', 'Over 50%'], meter: [8, 18, 38, 62] },
+    { id: 'assets', q: 'What are your total investable assets, including company stock?', help: 'Excludes your home.',
+      opts: ['Under $1 million', '$1 million to $3 million', '$3 million to $10 million', 'Over $10 million'] },
+    { id: 'timeline', q: 'When would you like a plan in place?', help: '',
+      opts: ['Within the next 30 days', 'In 1 to 6 months', 'In 6 to 12 months', 'Just researching for now'] },
+    { id: 'goal', q: 'What matters most to you right now?', help: 'Pick the one that is most pressing.',
+      opts: ['Reduce my single stock risk', 'Manage taxes on vesting or exercise', 'Plan around a departure, acquisition or IPO', 'Retire earlier or on my own terms'] },
+    { id: 'contact', contact: true, q: 'Where should we send your meeting details?', help: 'Used only to schedule and prepare for your call.' }
+  ];
+  var card = document.getElementById('qcard');
+  var fallback = card.getAttribute('data-fallback-email');
+  var step = 0, a = {}, contact = {};
+  var notYet = function () { return a.intent && a.intent.indexOf('Not yet') === 0; };
+
+  // Attribution, same scheme as the campaign pages.
+  var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'], utm = {}, KEY = 'skyview_utm:' + location.pathname;
+  try {
+    var qs = new URLSearchParams(location.search);
+    UTM.forEach(function (k) { if (qs.get(k)) utm[k] = qs.get(k).slice(0, 100); });
+    if (Object.keys(utm).length) sessionStorage.setItem(KEY, JSON.stringify(utm));
+    else utm = JSON.parse(sessionStorage.getItem(KEY) || '{}') || {};
+  } catch (e) {}
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  function setMeter() {
+    var s = STEPS[2], i = s.opts.indexOf(a.conc), one = document.getElementById('meterOne');
+    if (!one) return;
+    one.style.width = (i >= 0 ? s.meter[i] : 40) + '%';
+    document.getElementById('meterLabel').textContent = i >= 0 ? 'Your company stock: about ' + a.conc.toLowerCase() + ' of net worth' : 'Your company stock';
+  }
+
+  function renderQ() {
+    var s = STEPS[step], body;
+    var prog = STEPS.map(function (_, i) { return '<span class="' + (i <= step ? 'done' : '') + '"></span>'; }).join('');
+    if (s.contact) {
+      body = '<div class="fields">' +
+        '<div class="row2"><label>First name<input id="f-first" autocomplete="given-name" value="' + esc(contact.first) + '"></label>' +
+        '<label>Last name<input id="f-last" autocomplete="family-name" value="' + esc(contact.last) + '"></label></div>' +
+        '<label>Email<input id="f-email" type="email" autocomplete="email" value="' + esc(contact.email) + '"></label>' +
+        '<div class="row2"><label>Mobile phone<input id="f-phone" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
+        '<label>State<select id="f-state">' + ['', 'Florida', 'New York', 'New Jersey', 'Other'].map(function (o) { return '<option' + (contact.state === o ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label></div>' +
+        '<label>Company<input id="f-co" autocomplete="organization" value="' + esc(contact.company) + '"></label>' +
+        '<label class="chk"><input type="checkbox" id="f-sms"' + (contact.sms ? ' checked' : '') + '> Text me a reminder before my call. Message and data rates may apply. Reply STOP to opt out.</label>' +
+        '<div class="hp" aria-hidden="true"><label>Website<input id="f-hp" tabindex="-1" autocomplete="off"></label></div>' +
+        '</div>';
+    } else {
+      var cur = a[s.id];
+      body = '<div class="opts" role="group" aria-label="' + esc(s.q) + '">' + s.opts.map(function (o) {
+        var on = s.multi ? (cur || []).indexOf(o) >= 0 : cur === o;
+        return '<button type="button" class="opt' + (s.multi ? '' : ' radio') + '" aria-pressed="' + on + '" data-v="' + esc(o) + '"><span class="box"></span>' + esc(o) + '</button>';
+      }).join('') + '</div>';
+    }
+    var heading = s.contact && notYet() ? 'Where should we send your reading list?' : s.q;
+    card.innerHTML = '<div class="prog">' + prog + '</div><p class="count">Question ' + (step + 1) + ' of ' + STEPS.length + '</p>' +
+      '<h2>' + esc(heading) + '</h2>' + (s.help ? '<p class="help">' + esc(s.help) + '</p>' : '') + body +
+      '<p class="err" id="err" role="alert"></p>' +
+      '<div class="nav">' + (step > 0 ? '<button type="button" class="link" id="back">Back</button>' : '<span></span>') +
+      '<button type="button" class="btn" id="next">' + (s.contact ? (notYet() ? 'Send it to me' : 'See available times') : 'Continue') + '</button></div>' +
+      (s.contact ? '<p class="fine">By continuing you agree to be contacted by Skyview Financial Group about your request. We never sell your information. <a href="/disclaimers.html#privacy-disclosures">Privacy</a></p>' : '');
+
+    card.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var v = b.getAttribute('data-v');
+        if (s.multi) { var arr = (a[s.id] || []).slice(), i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); a[s.id] = arr; }
+        else a[s.id] = v;
+        renderQ(); setMeter();
+        if (!s.multi) setTimeout(next, 180);
+      });
+    });
+    var back = document.getElementById('back');
+    if (back) back.addEventListener('click', function () { keepContact(); step = (s.contact && notYet()) ? 0 : step - 1; renderQ(); });
+    document.getElementById('next').addEventListener('click', next);
+  }
+
+  function keepContact() {
+    if (!document.getElementById('f-first')) return;
+    contact = { first: val('f-first'), last: val('f-last'), email: val('f-email'), phone: val('f-phone'), state: val('f-state'), company: val('f-co'), sms: document.getElementById('f-sms').checked };
+  }
+
+  function next() {
+    var s = STEPS[step], err = document.getElementById('err');
+    if (s.contact) return submit(err);
+    var v = a[s.id];
+    if (!v || (s.multi && !v.length)) { err.textContent = 'Choose an answer to continue.'; return; }
+    if (s.id === 'intent' && notYet()) { step = STEPS.length - 1; renderQ(); return; }
+    step++; renderQ();
+  }
+
+  function submit(err) {
+    keepContact();
+    if (!contact.first || !contact.last || !contact.email || !contact.state) { err.textContent = 'Add your name, email and state to continue.'; return; }
+    if (contact.sms && !contact.phone) { err.textContent = 'Add a mobile number for text reminders, or uncheck that box.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(contact.email)) { err.textContent = 'Check the email address. It needs an @ and a domain.'; return; }
+    var btn = document.getElementById('next'); btn.disabled = true; btn.textContent = 'Sending';
+    var payload = { answers: a, contact: contact, website_url: val('f-hp'), page: location.pathname,
+      source: document.referrer ? 'referral: ' + document.referrer.split('/')[2] : 'direct' };
+    UTM.forEach(function (k) { payload[k] = utm[k] || ''; });
+    fetch('/api/qualify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ''); return d; }); })
+      .then(function (d) {
+        if (typeof window.skyviewTrack === 'function') window.skyviewTrack('stock_review_lead', { company: 'concentrated-stock', qualified: d.qualified ? 'yes' : 'no', leads: 1 });
+        if (d.qualified) renderBook(); else renderGuide();
+      })
+      .catch(function (e) {
+        btn.disabled = false; btn.textContent = notYet() ? 'Send it to me' : 'See available times';
+        err.textContent = e.message || ('Something went wrong. Email ' + fallback + ' and we will set up a time with you directly.');
+      });
+  }
+
+  function renderBook() {
+    var path = card.getAttribute('data-tidycal');
+    if (!path) {
+      card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. You are a good fit for a call.</h2>' +
+        '<p class="help">We will reach out within one business day to find a time. A confirmation is in your inbox now.</p>';
+      return;
+    }
+    card.innerHTML = '<h2>You are a good fit, ' + esc(contact.first) + '. Pick a time.</h2>' +
+      '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
+      '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '"></div></div>' +
+      '<p class="fine">Prefer to talk first? Reply to the email we just sent and we will call you.</p>';
+    var sc = document.createElement('script'); sc.src = 'https://asset-tidycal.b-cdn.net/js/embed.js'; sc.async = true; document.body.appendChild(sc);
+  }
+
+  function renderGuide() {
+    card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. Your reading list is on its way.</h2>' +
+      '<p class="help">Check your inbox for short guides on RSU taxes, option exercise timing and diversifying a concentrated position. If your plans change, reply to that email and we will set up a call.</p>';
+  }
+
+  renderQ(); setMeter();
+})();
+</script>
+</body>
+</html>
