@@ -23,7 +23,7 @@ const ARCHIVE = 'ajpotenza@skyviewfg.com';
 const SITE = 'https://skyviewfg.com';
 // Public TidyCal booking page, used in the confirmation email. Set to the
 // same path as data-tidycal on stock-compensation-review.html. Empty = "we will call you".
-const TIDYCAL_URL = '';
+const TIDYCAL_URL = 'https://tidycal.com/ajpotenza/30-minute-meeting';
 
 const SIGNATURE = [
   'Alex J. Potenza, CFP®, CPWA®',

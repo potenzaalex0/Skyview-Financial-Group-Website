@@ -110,8 +110,8 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     </div>
   </div>
 
-  <!-- data-tidycal: the TidyCal booking path, e.g. "ajpotenza/stock-review-30". Empty = no embed; qualified visitors are told we will call. -->
-  <div class="card" id="qcard" aria-live="polite" data-tidycal="" data-fallback-email="ajpotenza@skyviewfg.com"></div>
+  <!-- data-tidycal: the TidyCal booking type path (tidycal.com/<path>). Empty = no embed; qualified visitors are told we will call. -->
+  <div class="card" id="qcard" aria-live="polite" data-tidycal="ajpotenza/30-minute-meeting" data-fallback-email="ajpotenza@skyviewfg.com"></div>
 </div>
 
 <section class="band"><div class="wrap cols">
@@ -266,6 +266,8 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
       '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '"></div></div>' +
       '<p class="fine">Prefer to talk first? Reply to the email we just sent and we will call you.</p>';
+    var el = card.querySelector('.tidycal-embed');
+    if (window.TidyCal && typeof window.TidyCal.init === 'function') { window.TidyCal.init(el); return; }
     var sc = document.createElement('script'); sc.src = 'https://asset-tidycal.b-cdn.net/js/embed.js'; sc.async = true; document.body.appendChild(sc);
   }
 
