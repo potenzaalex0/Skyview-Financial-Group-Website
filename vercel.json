@@ -5,6 +5,10 @@
   "outputDirectory": ".",
   "rewrites": [
     {
+      "source": "/stock-compensation-review",
+      "destination": "/stock-compensation-review.html"
+    },
+    {
       "source": "/:page([a-z0-9-]+-equity-compensation-webinar)",
       "destination": "/lp/:page.html"
     },
@@ -233,6 +237,19 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/stock-compensation-review(.html)?",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },

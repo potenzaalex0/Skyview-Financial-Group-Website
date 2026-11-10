@@ -1,5 +1,5 @@
 /* =====================================================================
-   Concentrated stock funnel: qualifier handler for /stock-review.html.
+   Concentrated stock funnel: qualifier handler for /stock-compensation-review.html.
 
    The page posts the visitor's answers and contact details here. This
    function decides fit on the server (never trusts the page), then:
@@ -22,7 +22,7 @@ const REPLY_TO = 'ajpotenza@skyviewfg.com';
 const ARCHIVE = 'ajpotenza@skyviewfg.com';
 const SITE = 'https://skyviewfg.com';
 // Public TidyCal booking page, used in the confirmation email. Set to the
-// same path as data-tidycal on stock-review.html. Empty = "we will call you".
+// same path as data-tidycal on stock-compensation-review.html. Empty = "we will call you".
 const TIDYCAL_URL = '';
 
 const SIGNATURE = [
@@ -32,7 +32,7 @@ const SIGNATURE = [
   '(888) 406-0444',
 ].join('\n');
 
-// Must match the option text on stock-review.html exactly.
+// Must match the option text on stock-compensation-review.html exactly.
 const OPTIONS = {
   intent: ['Yes, I want to talk this through soon', 'Not yet, I am just learning'],
   holdings: ['RSUs (vested or unvested)', 'Stock options (ISOs or NQSOs)', 'ESPP shares', 'Restricted stock or founder shares', 'Shares from a past grant or IPO'],
