@@ -80,6 +80,17 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 .team p{margin:0;color:var(--muted)}
 .disc{border-top:1px solid var(--line);padding-top:28px;padding-bottom:48px;font-size:12.5px;color:var(--muted);line-height:1.55}
 .disc p{margin:0 0 10px}
+.cta-row{padding-top:8px;padding-bottom:8px}
+.cta{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;border-radius:8px;padding:14px 22px;font-size:16px}
+.cta-note{font-size:13.5px;color:var(--muted);margin:8px 0 0}
+.band .cta-row{grid-column:1/-1;padding:8px 0 0}
+.sticky{display:none}
+@media (max-width:860px){
+  .sticky{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.96);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,40,80,.08);transition:transform .25s}
+  .sticky .cta{flex:1;text-align:center}
+  .sticky.hide{transform:translateY(120%)}
+  body{padding-bottom:84px}
+}
 @media (max-width:860px){
   .hero{grid-template-columns:1fr;gap:28px;padding-top:28px}
   .points,.meter{display:none}
@@ -97,12 +108,14 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 <main>
 <div class="wrap hero">
   <div>
-    <h1>Most of your net worth is in one stock. Here is how to plan the way out.</h1>
-    <p class="lede">A 30 minute call with a CFP® and CPWA® advisor to look at your grants, your tax picture and a realistic schedule for diversifying.</p>
+    <h1 id="h1">Most of your net worth is in one stock. Here is how to plan the way out.</h1>
+    <p class="lede">A 30 minute call with Alex R. Potenza, CIMA®, and Alex J. Potenza, CFP®, CPWA®, to look at your grants, your tax picture and a realistic schedule for diversifying.</p>
     <ul class="points">
-      <li>Which shares to sell first, based on cost basis, holding period and vest schedule</li>
+      <li>How cost basis, holding period and vest dates shape the order you diversify in</li>
       <li>What the tax bill looks like this year and next, before you sell anything</li>
       <li>Whether a 10b5-1 plan, exchange fund or charitable strategy makes sense for you</li>
+      <li>Whether your RSU withholding covers the tax you will owe</li>
+      <li>Which deadlines apply if you leave, retire or your company is acquired</li>
     </ul>
     <div class="meter" aria-live="polite">
       <div class="meter-bar"><div class="meter-one" id="meterOne"></div><div class="meter-rest"></div></div>
@@ -118,16 +131,20 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   <div><h3>What we look at</h3><p>Your RSU, option and ESPP history, current holdings, cost basis and the next 24 months of vests.</p></div>
   <div><h3>What you leave with</h3><p>A short summary of your concentration risk, an estimated tax range for diversifying, and two or three paths to consider.</p></div>
   <div><h3>What it costs</h3><p>Nothing. We are a fee only fiduciary. We do not sell products or earn commissions.</p></div>
+  <div class="cta-row"><a class="cta" href="#qcard" data-cta>Check your fit and pick a time</a><p class="cta-note">Seven questions, about two minutes. If it's a fit, you choose a time on the next screen.</p></div>
 </div></section>
 
 <section class="wrap team">
   <h2>Who you will meet</h2>
+  <p style="grid-column:1/-1;margin:-24px 0 0">Both of us join every call.</p>
   <div><h3>Alex R. Potenza</h3><p class="cred">CIMA®, CDFA®, President</p>
     <p>Twenty-five years as a financial advisor, including Merrill Lynch, UBS Financial Services and Raymond James, much of it working with executives on equity compensation and concentrated stock.</p></div>
   <div><h3>Alex J. Potenza</h3><p class="cred">CFP®, CPWA®, Vice President</p>
     <p>Leads financial planning at Skyview, with a focus on equity compensation, tax planning and retirement income.</p></div>
 </section>
+<div class="wrap cta-row" style="padding-bottom:48px"><a class="cta" href="#qcard" data-cta>Check your fit and pick a time</a><p class="cta-note">Seven questions, about two minutes. If it's a fit, you choose a time on the next screen.</p></div>
 </main>
+<div class="sticky" id="sticky"><a class="cta" href="#qcard" data-cta>Check your fit and pick a time</a></div>
 
 <footer class="wrap disc">
   <p>Skyview Financial Group, LLC is an investment adviser registered with the U.S. Securities and Exchange Commission, located in Ponte Vedra Beach, FL. Investment advisory services are offered through Skyview Financial Group. Custody services provided by Fidelity Brokerage Services LLC and Charles Schwab &amp; Co., Inc., Members FINRA/SIPC, and/or other qualified custodians. Registration with the SEC or any state securities authority does not imply a certain level of skill or training. Information provided on this website is for general informational and educational purposes only and should not be construed as personalized investment, legal, tax, or accounting advice. Skyview Financial Group, LLC does not provide legal or tax advice.</p>
@@ -274,6 +291,24 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   function renderGuide() {
     card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. Your reading list is on its way.</h2>' +
       '<p class="help">Check your inbox for short guides on RSU taxes, option exercise timing and diversifying a concentrated position. If your plans change, reply to that email and we will set up a call.</p>';
+  }
+
+  // Message match: headline follows the ad. Ad names in Meta start with A, B or C,
+  // and arrive as utm_content ({{ad.name}}). Unknown or missing = Ad A default.
+  var H1 = {
+    b: 'RSU taxes did not all come out at vest. Here is how to plan for the rest.',
+    c: 'Leaving, retiring or being acquired? Plan your stock comp before the date.'
+  };
+  var ad = String(utm.utm_content || '').trim().charAt(0).toLowerCase();
+  if (H1[ad]) { document.getElementById('h1').textContent = H1[ad]; document.title = H1[ad] + ' | Skyview Financial Group'; }
+
+  // CTA buttons scroll to the qualifier; the mobile bar hides while it is on screen.
+  document.querySelectorAll('[data-cta]').forEach(function (b) {
+    b.addEventListener('click', function (e) { e.preventDefault(); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  });
+  var bar = document.getElementById('sticky');
+  if (bar && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) { bar.classList.toggle('hide', en[0].isIntersecting); }, { threshold: 0.25 }).observe(card);
   }
 
   renderQ(); setMeter();
