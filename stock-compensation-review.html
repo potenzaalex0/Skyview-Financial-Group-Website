@@ -279,10 +279,12 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
         '<p class="help">We will reach out within one business day to find a time. A confirmation is in your inbox now.</p>';
       return;
     }
+    var nm = ((contact.first || '') + ' ' + (contact.last || '')).trim();
+    var link = 'https://tidycal.com/' + path + '?name=' + encodeURIComponent(nm) + '&email=' + encodeURIComponent(contact.email || '');
     card.innerHTML = '<h2>You are a good fit, ' + esc(contact.first) + '. Pick a time.</h2>' +
       '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
-      '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '"></div></div>' +
-      '<p class="fine">Prefer to talk first? Reply to the email we just sent and we will call you.</p>';
+      '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '" data-name="' + esc(nm) + '" data-email="' + esc(contact.email) + '"></div></div>' +
+      '<p class="fine"><strong>Calendar not showing?</strong> <a href="' + esc(link) + '" target="_blank" rel="noopener">Open it in a new tab</a>, or reply to the email we just sent and we will call you.</p>';
     var el = card.querySelector('.tidycal-embed');
     if (window.TidyCal && typeof window.TidyCal.init === 'function') { window.TidyCal.init(el); return; }
     var sc = document.createElement('script'); sc.src = 'https://asset-tidycal.b-cdn.net/js/embed.js'; sc.async = true; document.body.appendChild(sc);
@@ -310,6 +312,12 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   if (bar && 'IntersectionObserver' in window) {
     new IntersectionObserver(function (en) { bar.classList.toggle('hide', en[0].isIntersecting); }, { threshold: 0.25 }).observe(card);
   }
+
+  // TidyCal tells the page when a booking completes inside the embed.
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://tidycal.com' || !e.data || e.data.event !== 'bookingComplete') return;
+    if (typeof window.skyviewTrack === 'function') window.skyviewTrack('stock_review_booking', { company: 'concentrated-stock', bookings: 1 });
+  });
 
   renderQ(); setMeter();
 })();
