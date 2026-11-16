@@ -298,8 +298,8 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   // Message match: headline follows the ad. Ad names in Meta start with A, B or C,
   // and arrive as utm_content ({{ad.name}}). Unknown or missing = Ad A default.
   var H1 = {
-    b: 'RSU taxes did not all come out at vest. Here is how to plan for the rest.',
-    c: 'Leaving, retiring or being acquired? Plan your stock comp before the date.'
+    b: 'Retiring soon? Diversify your company stock before your last paycheck.',
+    c: 'Leaving your job? Plan your stock options before your last day.'
   };
   var ad = String(utm.utm_content || '').trim().charAt(0).toLowerCase();
   if (H1[ad]) { document.getElementById('h1').textContent = H1[ad]; document.title = H1[ad] + ' | Skyview Financial Group'; }
