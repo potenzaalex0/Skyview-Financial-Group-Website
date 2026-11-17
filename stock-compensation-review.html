@@ -122,7 +122,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     </ul>
     <div class="meter" aria-live="polite">
       <div class="meter-bar"><div class="meter-one" id="meterOne"></div><div class="meter-rest"></div></div>
-      <div class="meter-cap"><span id="meterLabel">Your company stock: 72%</span><span>Everything else: 28%</span></div>
+      <div class="meter-cap"><span id="meterLabel">Your company stock: 72%</span><span id="meterRest">Everything else: 28%</span></div>
       <p class="meter-note">Example. Answer the questions to see your own split.</p>
     </div>
   </div>
@@ -191,7 +191,9 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     var s = STEPS.filter(function (x) { return x.id === 'conc'; })[0], i = s.opts.indexOf(a.conc), one = document.getElementById('meterOne');
     if (!one) return;
     one.style.width = (i >= 0 ? s.meter[i] : 72) + '%';
-    document.getElementById('meterLabel').textContent = i >= 0 ? 'Your company stock: about ' + a.conc.toLowerCase() + ' of net worth' : 'Your company stock: 72%';
+    document.getElementById('meterLabel').textContent = i >= 0 ? 'Your company stock: ' + a.conc.toLowerCase() : 'Your company stock: 72%';
+    document.getElementById('meterRest').textContent = 'Everything else: ' + (i >= 0 ? ['over 90%', '75% to 90%', '50% to 75%', 'under 50%'][i] : '28%');
+    var note = document.querySelector('.meter-note'); if (note) note.textContent = i >= 0 ? 'Based on your answer.' : 'Example. Answer the questions to see your own split.';
   }
 
   function renderQ() {
