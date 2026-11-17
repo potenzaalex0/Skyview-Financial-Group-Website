@@ -77,6 +77,14 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 .team{padding-top:56px;padding-bottom:56px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
 .team h2{grid-column:1/-1;font-size:28px;letter-spacing:-.02em;margin:0}
 .team h3{margin:0;font-size:19px}
+.creds{padding-top:56px;padding-bottom:56px}
+.creds h2{font-size:28px;letter-spacing:-.02em;margin:0 0 28px}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.cgrid div{border-top:3px solid var(--blue);padding-top:16px}
+.cgrid b{display:block;font-size:20px;letter-spacing:-.01em}
+.cgrid p{margin:8px 0 0;color:var(--muted);font-size:15px}
+@media (max-width:900px){.cgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.cgrid{grid-template-columns:1fr;gap:22px}}
 .headshot{width:96px;height:96px;border-radius:50%;object-fit:cover;object-position:center top;display:block;margin:0 0 14px;border:3px solid var(--surface,#eef3f7)}
 .cred{color:var(--blue-ink);font-weight:600;font-size:14px;margin:2px 0 10px}
 .team p{margin:0;color:var(--muted)}
@@ -138,13 +146,14 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   <div class="cta-row"><a class="cta" href="#qcard" data-cta>Get my custom strategy</a><p class="cta-note">Five questions, about a minute. If it's a fit, you choose a time on the next screen.</p></div>
 </div></section>
 
-<section class="wrap team">
-  <h2>Our team</h2>
-  <p style="grid-column:1/-1;margin:-24px 0 0">Your call is with one of our advisors.</p>
-  <div><img class="headshot" src="/assets/team/alex-r-potenza.jpg" alt="Alex R. Potenza" width="96" height="96" loading="lazy"><h3>Alex R. Potenza</h3><p class="cred">CIMA®, President</p>
-    <p>Twenty-five years as a financial advisor, including Merrill Lynch, UBS Financial Services and Raymond James, much of it working with executives on equity compensation and concentrated stock.</p></div>
-  <div><img class="headshot" src="/assets/team/alex-j-potenza.jpg" alt="Alex J. Potenza" width="96" height="96" loading="lazy"><h3>Alex J. Potenza</h3><p class="cred">CFP®, CPWA®, Vice President</p>
-    <p>Leads financial planning at Skyview, with a focus on equity compensation, tax planning and retirement income.</p></div>
+<section class="wrap creds">
+  <h2>Why executives work with Skyview</h2>
+  <div class="cgrid">
+    <div><b>30+ years</b><p>Advising executives on equity compensation and concentrated stock, including at Merrill Lynch, UBS Financial Services and Raymond James.</p></div>
+    <div><b>CFP®, CPWA®, CIMA®</b><p>Credentials in financial planning, private wealth management and investment management.</p></div>
+    <div><b>Fee only fiduciary</b><p>No commissions and no products to sell. Our advice is required to put your interests first.</p></div>
+    <div><b>Fidelity and Schwab</b><p>Your assets stay in your name at a major independent custodian.</p></div>
+  </div>
 </section>
 <div class="wrap cta-row" style="padding-bottom:48px"><a class="cta" href="#qcard" data-cta>Get my custom strategy</a><p class="cta-note">Five questions, about a minute. If it's a fit, you choose a time on the next screen.</p></div>
 </main>
