@@ -201,7 +201,6 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
         '<div class="row2"><label>Mobile phone<input id="f-phone" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
         '<label>State<select id="f-state">' + ['', 'Florida', 'New York', 'New Jersey', 'Other'].map(function (o) { return '<option' + (contact.state === o ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label></div>' +
         '<label>Company<input id="f-co" autocomplete="organization" value="' + esc(contact.company) + '"></label>' +
-        '<label class="chk"><input type="checkbox" id="f-sms"' + (contact.sms ? ' checked' : '') + '> Text me a reminder before my call. Message and data rates may apply. Reply STOP to opt out.</label>' +
         '<div class="hp" aria-hidden="true"><label>Website<input id="f-hp" tabindex="-1" autocomplete="off"></label></div>' +
         '</div>';
     } else {
@@ -235,7 +234,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 
   function keepContact() {
     if (!document.getElementById('f-first')) return;
-    contact = { first: val('f-first'), last: val('f-last'), email: val('f-email'), phone: val('f-phone'), state: val('f-state'), company: val('f-co'), sms: document.getElementById('f-sms').checked };
+    contact = { first: val('f-first'), last: val('f-last'), email: val('f-email'), phone: val('f-phone'), state: val('f-state'), company: val('f-co') };
   }
 
   function next() {
@@ -249,7 +248,6 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   function submit(err) {
     keepContact();
     if (!contact.first || !contact.last || !contact.email || !contact.state) { err.textContent = 'Add your name, email and state to continue.'; return; }
-    if (contact.sms && !contact.phone) { err.textContent = 'Add a mobile number for text reminders, or uncheck that box.'; return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(contact.email)) { err.textContent = 'Check the email address. It needs an @ and a domain.'; return; }
     var btn = document.getElementById('next'); btn.disabled = true; btn.textContent = 'Sending';
     var payload = { answers: a, contact: contact, website_url: val('f-hp'), page: location.pathname,
