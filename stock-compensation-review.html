@@ -162,14 +162,14 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       opts: ['Under 10%', '10% to 25%', '25% to 50%', 'Over 50%'], meter: [8, 18, 38, 62] },
     { id: 'assets', q: 'What are your total investable assets, including company stock?', help: 'Excludes your home.',
       opts: ['Under $1 million', '$1 million to $3 million', '$3 million to $10 million', 'Over $10 million'] },
-    { id: 'timeline', q: 'When would you like a plan in place?', help: '',
-      opts: ['Within the next 30 days', 'In 1 to 6 months', 'In 6 to 12 months', 'Just researching for now'] },
+    { id: 'goal', q: 'What matters most to you right now?', help: 'Pick the one that is most pressing.',
+      opts: ['Reduce my single stock risk', 'Manage taxes on vesting or exercise', 'Plan around a departure, acquisition or IPO', 'Retire earlier or on my own terms'] },
     { id: 'contact', contact: true, q: 'Where should we send your meeting details?', help: 'Used only to schedule and prepare for your call.' }
   ];
   var card = document.getElementById('qcard');
   var fallback = card.getAttribute('data-fallback-email');
   var step = 0, a = {}, contact = {};
-  var notYet = function () { return a.timeline === 'Just researching for now'; };
+  var notYet = function () { return false; };
 
   // Attribution, same scheme as the campaign pages.
   var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'], utm = {}, KEY = 'skyview_utm:' + location.pathname;

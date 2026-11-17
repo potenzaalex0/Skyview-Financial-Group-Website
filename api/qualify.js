@@ -9,7 +9,7 @@
    and returns { ok, qualified } so the page can show TidyCal or the
    reading-list confirmation.
 
-   Qualified = $1M+ investable AND timeline under 6 months. Change MIN_ASSETS_INDEX / TIMELINE_OK below to adjust.
+   Qualified = $1M+ investable. Change MIN_ASSETS_INDEX below to adjust.
 
    Uses the same Resend setup as api/lead.js (RESEND_API_KEY). Plain text
    emails, BCC to the compliance archive, same as every other form.
@@ -80,8 +80,7 @@ async function sendEmail(payload) {
 
 function qualify(a) {
   const assetsOk = OPTIONS.assets.indexOf(a.assets) >= MIN_ASSETS_INDEX;
-  const timeOk = TIMELINE_OK.includes(OPTIONS.timeline.indexOf(a.timeline));
-  return { qualified: assetsOk && timeOk, assetsOk, timeOk };
+  return { qualified: assetsOk, assetsOk };
 }
 
 // --- visitor emails (no dashes, professional tone) -------------------
@@ -150,7 +149,7 @@ function briefing(a, c, q) {
   if (c.sms) before.push('Opted in to a text reminder: text 2 hours before from the work number. "Reply YES to confirm."');
 
   return [
-    `FIT: ${q.qualified ? 'QUALIFIED' : 'NOT QUALIFIED'} (assets ${q.assetsOk ? 'ok' : 'below $1M'}, timeline ${q.timeOk ? 'ok' : 'too far out'})`,
+    `FIT: ${q.qualified ? 'QUALIFIED' : 'NOT QUALIFIED'} (assets ${q.assetsOk ? 'ok' : 'below $1M'})`,
     '',
     `Name: ${c.first} ${c.last}`,
     `Email: ${c.email}`,
@@ -161,7 +160,7 @@ function briefing(a, c, q) {
     `Holdings: ${a.holdings.join(', ') || 'skipped'}`,
     `Concentration: ${a.conc || 'skipped'}`,
     `Investable assets: ${a.assets || 'skipped'}`,
-    `Timeline: ${a.timeline || 'skipped'}`,
+    `Top priority: ${a.goal || 'skipped'}`,
     ...(q.qualified ? [
       '',
       'BEFORE THE CALL',
@@ -222,7 +221,7 @@ module.exports = async (req, res) => {
   };
   const utm = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].map((k) => `${k.slice(4)}=${clean(d[k], 100) || 'none'}`).join(' ');
 
-  if (!a.assets || !a.timeline) return res.status(400).json({ error: 'Please answer each question.' });
+  if (!a.assets) return res.status(400).json({ error: 'Please answer each question.' });
   if (!c.first || !c.last || !isEmail(c.email) || !c.state) return res.status(400).json({ error: 'Please check your name, email and state.' });
 
   const q = qualify(a);
