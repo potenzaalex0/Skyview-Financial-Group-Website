@@ -28,6 +28,10 @@
 (function () {
   'use strict';
   var GA_ID = '__GA4_MEASUREMENT_ID__';
+  // Meta pixel: only on pages that opt in with window.SKYVIEW_PAGE.meta = true
+  // (paid-social landing pages). Same consent choice as GA4. No form data or
+  // personal details are ever sent to Meta, only the event name.
+  var META_ID = '__META_PIXEL_ID__';
   var KEY = 'skyview_consent_v1';
   var MAX_AGE_DAYS = 365;                       // re-ask after a year
   var COOKIE_SECONDS = 60 * 60 * 24 * 395;      // _ga cookies: ~13 months
@@ -36,6 +40,10 @@
   var enabled = /^G-[A-Z0-9]+$/.test(GA_ID);
   var loaded = false;
   var page = window.SKYVIEW_PAGE || {};
+  var metaOn = /^[0-9]{10,20}$/.test(META_ID) && page.meta === true;
+  var metaLoaded = false;
+  // GA4 event name -> Meta standard event
+  var META_EVENTS = { stock_review_lead: 'Lead', stock_review_booking: 'Schedule' };
   var query = {};
   try {
     var q = new URLSearchParams(window.location.search);
@@ -88,6 +96,30 @@
     document.head.appendChild(s);
   }
 
+  // ---- Meta pixel ----------------------------------------------------
+  function loadMeta() {
+    if (metaLoaded || !metaOn) return;
+    metaLoaded = true;
+    /* Standard Meta pixel bootstrap */
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('set', 'autoConfig', false, META_ID);   // no automatic button/form scraping
+    window.fbq('init', META_ID);
+    window.fbq('track', 'PageView');
+  }
+  function stopMeta() {
+    document.cookie.split(';').forEach(function (c) {
+      var name = c.split('=')[0].trim();
+      if (name !== '_fbp' && name !== '_fbc') return;
+      ['', '.' + window.location.hostname.split('.').slice(-2).join('.')].forEach(function (d) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + (d ? '; domain=' + d : '');
+      });
+    });
+  }
+
   function stopGA() {
     window['ga-disable-' + GA_ID] = true;
     // Remove _ga / _ga_XXXX cookies on this host and the parent domain.
@@ -104,6 +136,10 @@
 
   // Campaign forms call this on SUCCESSFUL submit only.
   window.skyviewTrack = function (name, params) {
+    if (metaLoaded && typeof window.fbq === 'function' && META_EVENTS[name]) {
+      window.fbq('track', META_EVENTS[name]);
+      if (name === 'stock_review_lead' && params && params.qualified === 'yes') window.fbq('trackCustom', 'QualifiedLead');
+    }
     if (!loaded || typeof window.gtag !== 'function') return false;
     var p = {};
     for (var k in params) {
@@ -142,8 +178,10 @@
     bannerEl.setAttribute('role', 'region');
     bannerEl.setAttribute('aria-label', 'Cookie notice');
     bannerEl.innerHTML =
-      '<p>This site uses Google Analytics cookies to understand how visitors find and use it. ' +
-      'We do not use advertising cookies. You may decline at any time. ' +
+      '<p>' + (metaOn
+        ? 'This site uses Google Analytics and Meta (Facebook) cookies to understand how visitors find and use it and to measure our ads. We never share what you type into our forms. '
+        : 'This site uses Google Analytics cookies to understand how visitors find and use it. We do not use advertising cookies. ') +
+      'You may decline at any time. ' +
       '<a href="' + POLICY_URL + '">Privacy Policy</a></p>' +
       '<div class="sv-btns"><button type="button" class="sv-decline" data-choice="denied">Decline</button>' +
       '<button type="button" class="sv-accept" data-choice="granted">OK</button></div>';
@@ -152,15 +190,15 @@
       if (!choice) return;
       saveChoice(choice);
       bannerEl.style.display = 'none';
-      if (choice === 'granted') loadGA();
-      else { var wasLoaded = loaded; stopGA(); if (wasLoaded) window.location.reload(); }
+      if (choice === 'granted') { loadGA(); loadMeta(); }
+      else { var wasLoaded = loaded || metaLoaded; stopGA(); stopMeta(); if (wasLoaded) window.location.reload(); }
     });
     document.body.appendChild(bannerEl);
   }
 
   function init() {
     var choice = readChoice();
-    if (choice !== 'denied') loadGA();
+    if (choice !== 'denied') { loadGA(); loadMeta(); }
     if (choice === null) showBanner();
     if (window.location.hash === '#cookie-settings') showBanner();
     document.addEventListener('click', function (e) {

@@ -242,8 +242,13 @@ function buildAnalytics() {
   const ok = /^G-[A-Z0-9]+$/.test(id);
   if (!ok) console.warn(`  WARNING GA4_MEASUREMENT_ID is ${id ? 'invalid ("' + id + '")' : 'not set'}: /analytics.js will collect nothing and show no banner`);
   const src = fs.readFileSync(path.join(__dirname, 'analytics.src.js'), 'utf8');
-  fs.writeFileSync(path.join(ROOT, 'analytics.js'), src.replace("var GA_ID = '__GA4_MEASUREMENT_ID__';", `var GA_ID = '${ok ? id : ''}';`));
-  console.log(`  built /analytics.js  (GA4 ${ok ? id : 'disabled'})`);
+  const metaId = (process.env.META_PIXEL_ID || '').trim();
+  const metaOk = /^[0-9]{10,20}$/.test(metaId);
+  if (metaId && !metaOk) console.warn(`  WARNING META_PIXEL_ID is invalid ("${metaId}"): Meta pixel disabled`);
+  fs.writeFileSync(path.join(ROOT, 'analytics.js'), src
+    .replace("var GA_ID = '__GA4_MEASUREMENT_ID__';", `var GA_ID = '${ok ? id : ''}';`)
+    .replace("var META_ID = '__META_PIXEL_ID__';", `var META_ID = '${metaOk ? metaId : ''}';`));
+  console.log(`  built /analytics.js  (GA4 ${ok ? id : 'disabled'}, Meta pixel ${metaOk ? metaId : 'disabled'})`);
 }
 
 // ---------------------------------------------------------------------
