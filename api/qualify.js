@@ -17,6 +17,9 @@
 'use strict';
 
 const FROM = 'Alex J. Potenza | Skyview Financial Group <ajpotenza@mail.skyviewfg.com>';
+// Internal lead alerts use a neutral sender so Microsoft 365 does not flag
+// 'Alex J. Potenza' emailing Alex J. Potenza as impersonation.
+const ALERT_FROM = 'Skyview Website Leads <leads@mail.skyviewfg.com>';
 const REPLY_TO = 'ajpotenza@skyviewfg.com';
 const ARCHIVE = 'ajpotenza@skyviewfg.com';
 const SITE = 'https://skyviewfg.com';
@@ -230,7 +233,7 @@ module.exports = async (req, res) => {
   // Follow-up from the booking screen: visitor already submitted; only alert Alex.
   if (d.followup === 'callback') {
     try {
-      await sendEmail({ from: FROM, to: [ARCHIVE], reply_to: c.email,
+      await sendEmail({ from: ALERT_FROM, to: [ARCHIVE], reply_to: c.email,
         subject: `CALL REQUEST: ${c.first} ${c.last} ${c.phone}`,
         text: `${c.first} ${c.last} asked for a call instead of booking online.\nPhone: ${c.phone}\nEmail: ${c.email}\n\nCall within one business day.\n\n${briefing(a, c, q)}\n\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
     } catch (err) { console.error('[qualify] callback alert failed', err.message); }
@@ -247,7 +250,7 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('[qualify] visitor email failed', err.message);
     try {
-      await sendEmail({ from: FROM, to: [ARCHIVE], reply_to: REPLY_TO,
+      await sendEmail({ from: ALERT_FROM, to: [ARCHIVE], reply_to: REPLY_TO,
         subject: `ACTION NEEDED: stock review email failed, ${c.first} ${c.last}`,
         text: `The confirmation to ${c.email} did NOT send. Follow up by hand.\n\nError: ${err.message}\n\n${briefing(a, c, q)}\n` });
     } catch (e) { console.error('[qualify] alert also failed', e.message); }
@@ -255,7 +258,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    await sendEmail({ from: FROM, to: [ARCHIVE], reply_to: c.email,
+    await sendEmail({ from: ALERT_FROM, to: [ARCHIVE], reply_to: c.email,
       subject: `${c.callback ? 'CALL REQUEST' : q.qualified ? 'Stock review QUALIFIED' : 'Stock review (reading list)'}: ${c.first} ${c.last}${c.company ? ', ' + c.company : ''}`,
       text: `${c.callback ? `CALL REQUESTED. They chose "Alex will reach out" instead of booking. Call ${c.phone} within one business day.\n\n` : q.qualified ? 'No automated email was sent to them. If they have not booked within a few hours, text or call personally.\n\n' : ''}${briefing(a, c, q)}\n\nSource: ${clean(d.source, 200) || 'direct'}\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
   } catch (err) {
