@@ -233,9 +233,6 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
         '<div class="row2"><label>Mobile phone<input id="f-phone" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
         '<label>State<select id="f-state">' + ['', 'Florida', 'New York', 'New Jersey', 'Other'].map(function (o) { return '<option' + (contact.state === o ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label></div>' +
         '<label>Company<input id="f-co" autocomplete="organization" value="' + esc(contact.company) + '"></label>' +
-        '<div class="how" role="group" aria-label="How would you like to connect?"><p class="how-q">How would you like to connect?</p>' +
-        '<button type="button" class="opt radio" aria-pressed="' + !wantsCall + '" data-how="book"><span class="box"></span>Pick a time online</button>' +
-        '<button type="button" class="opt radio" aria-pressed="' + wantsCall + '" data-how="call"><span class="box"></span>Prefer a call? Alex will reach out</button></div>' +
         '<div class="hp" aria-hidden="true"><label>Website<input id="f-hp" tabindex="-1" autocomplete="off"></label></div>' +
         '</div>';
     } else {
@@ -298,7 +295,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     keepContact();
     if (!contact.first || !contact.last || !contact.email || !contact.state) { track('qualifier_error', { reason: 'missing_fields' }); err.textContent = 'Add your name, email and state to continue.'; return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(contact.email)) { track('qualifier_error', { reason: 'bad_email' }); err.textContent = 'Check the email address. It needs an @ and a domain.'; return; }
-    if (wantsCall && contact.phone.replace(/\D/g, '').length < 10) { track('qualifier_error', { reason: 'call_no_phone' }); err.textContent = 'Add a phone number so Alex can call you.'; return; }
+    if (wantsCall && contact.phone.replace(/\D/g, '').length < 10) { track('qualifier_error', { reason: 'call_no_phone' }); err.textContent = 'Add a phone number so we can call you.'; return; }
     contact.callback = wantsCall;
     var btn = document.getElementById('next'); btn.disabled = true; btn.textContent = 'Sending';
     track('qualifier_submit', { step_name: 'contact', callback: wantsCall ? 'yes' : 'no' });
@@ -323,7 +320,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     var path = card.getAttribute('data-tidycal');
     if (!path) {
       card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. You are a good fit for a call.</h2>' +
-        '<p class="help">Alex will reach out within one business day to find a time.</p>';
+        '<p class="help">We will reach out within one business day to find a time.</p>';
       return;
     }
     var nm = ((contact.first || '') + ' ' + (contact.last || '')).trim();
@@ -331,17 +328,17 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     card.innerHTML = '<h2>You are a good fit, ' + esc(contact.first) + '. Pick a time.</h2>' +
       '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
       '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '" data-name="' + esc(nm) + '" data-email="' + esc(contact.email) + '"></div></div>' +
-      '<div class="callalt"><button type="button" class="link" id="wantcall">Prefer a call? Alex will reach out</button>' +
+      '<div class="callalt"><button type="button" class="link" id="wantcall">Prefer a phone call instead? Request a call from an advisor</button>' +
       '<div id="callbox" hidden><label>Best number to reach you<input id="f-phone2" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
       '<button type="button" class="btn" id="sendcall">Request a call</button><p class="err" id="err2" role="alert"></p></div></div>' +
-      '<p class="fine"><strong>Calendar not showing?</strong> <a href="' + esc(link) + '" target="_blank" rel="noopener">Open it in a new tab</a>, or use the call option above and Alex will reach out.</p>';
+      '<p class="fine"><strong>Calendar not showing?</strong> <a href="' + esc(link) + '" target="_blank" rel="noopener">Open it in a new tab</a>, or request a call above.</p>';
     document.getElementById('wantcall').addEventListener('click', function () {
       trackOnce('callpick', 'qualifier_call_option', { step_name: 'booking' });
       var box = document.getElementById('callbox'); box.hidden = false; document.getElementById('f-phone2').focus();
     });
     document.getElementById('sendcall').addEventListener('click', function () {
       var ph = val('f-phone2'), e2 = document.getElementById('err2'), b = this;
-      if (ph.replace(/\D/g, '').length < 10) { e2.textContent = 'Add a phone number so Alex can call you.'; return; }
+      if (ph.replace(/\D/g, '').length < 10) { e2.textContent = 'Add a phone number so we can call you.'; return; }
       b.disabled = true; b.textContent = 'Sending';
       contact.phone = ph; contact.callback = true;
       var payload = { answers: a, contact: contact, followup: 'callback', page: location.pathname };
@@ -356,8 +353,8 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
   }
 
   function renderCall() {
-    card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. Alex will call you.</h2>' +
-      '<p class="help">Expect a call from Alex Potenza within one business day at ' + esc(contact.phone) + '.</p>';
+    card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. An advisor will call you.</h2>' +
+      '<p class="help">Expect a call from a Skyview advisor within one business day at ' + esc(contact.phone) + '.</p>';
   }
 
   function renderGuide() {
