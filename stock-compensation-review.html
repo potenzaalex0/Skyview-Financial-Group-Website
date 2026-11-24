@@ -69,6 +69,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 .link{background:none;border:0;color:var(--blue-ink);cursor:pointer;padding:6px 0;font-weight:600}
 .err{color:var(--warn);font-size:14px;margin:10px 0 0;min-height:1em}
 .fine{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5}
+.how{margin-top:6px}.how-q{font-weight:600;margin:6px 0 8px}.how .opt{margin-bottom:8px}.callalt{margin:14px 0 6px;text-align:center}.callalt label{display:grid;gap:4px;text-align:left;margin:10px 0;font-size:14px;font-weight:600}.callalt input{font:inherit;font-weight:400;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}.callalt .btn{width:100%}
 .tidycal-wrap{min-height:540px;margin:0 -12px}
 .band{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:56px 0}
 .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
@@ -173,15 +174,31 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       opts: ['RSUs (vested or unvested)', 'Stock options (ISOs or NQSOs)', 'ESPP shares', 'Restricted stock or founder shares', 'Shares from a past grant or IPO'] },
     { id: 'conc', q: 'Roughly how much of your net worth is in that one company?', help: 'A best guess is fine.',
       opts: ['Under 10%', '10% to 25%', '25% to 50%', 'Over 50%'], meter: [8, 18, 38, 72] },
-    { id: 'assets', q: 'What are your total investable assets, including company stock?', help: 'Excludes your home.',
-      opts: ['Under $1 million', '$1 million to $3 million', '$3 million to $10 million', 'Over $10 million'] },
     { id: 'goal', q: 'What matters most to you right now?', help: 'Pick the one that is most pressing.',
       opts: ['Reduce my single stock risk', 'Manage taxes on vesting or exercise', 'Plan around a departure, acquisition or IPO', 'Retire earlier or on my own terms'] },
+    { id: 'assets', q: 'What are your total investable assets, including company stock?', help: 'Excludes your home.',
+      opts: ['Under $1 million', '$1 million to $3 million', '$3 million to $10 million', 'Over $10 million'] },
     { id: 'contact', contact: true, q: 'Where should we send your meeting details?', help: 'Used only to schedule and prepare for your call.' }
   ];
   var card = document.getElementById('qcard');
   var fallback = card.getAttribute('data-fallback-email');
-  var step = 0, a = {}, contact = {};
+  var step = 0, a = {}, contact = {}, wantsCall = false;
+
+  // Funnel tracking (GA4 + Meta custom events). Each fires once per page view,
+  // so GA4 can show exactly where visitors stop: view > start > each step > contact > lead.
+  var seen = {};
+  // analytics.js loads deferred, so early events wait in a queue until it is ready.
+  var queued = [];
+  function track(name, params) {
+    var p = Object.assign({ company: 'concentrated-stock' }, params || {});
+    if (typeof window.skyviewTrack !== 'function') { queued.push([name, p]); return; }
+    window.skyviewTrack(name, p);
+  }
+  (function flush(n) {
+    if (typeof window.skyviewTrack === 'function') { queued.splice(0).forEach(function (e) { window.skyviewTrack(e[0], e[1]); }); return; }
+    if (n < 40) setTimeout(function () { flush(n + 1); }, 250);
+  })(0);
+  function trackOnce(key, name, params) { if (seen[key]) return; seen[key] = 1; track(name, params); }
   var notYet = function () { return false; };
 
   // Attribution, same scheme as the campaign pages.
@@ -216,6 +233,9 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
         '<div class="row2"><label>Mobile phone<input id="f-phone" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
         '<label>State<select id="f-state">' + ['', 'Florida', 'New York', 'New Jersey', 'Other'].map(function (o) { return '<option' + (contact.state === o ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></label></div>' +
         '<label>Company<input id="f-co" autocomplete="organization" value="' + esc(contact.company) + '"></label>' +
+        '<div class="how" role="group" aria-label="How would you like to connect?"><p class="how-q">How would you like to connect?</p>' +
+        '<button type="button" class="opt radio" aria-pressed="' + !wantsCall + '" data-how="book"><span class="box"></span>Pick a time online</button>' +
+        '<button type="button" class="opt radio" aria-pressed="' + wantsCall + '" data-how="call"><span class="box"></span>Prefer a call? Alex will reach out</button></div>' +
         '<div class="hp" aria-hidden="true"><label>Website<input id="f-hp" tabindex="-1" autocomplete="off"></label></div>' +
         '</div>';
     } else {
@@ -230,11 +250,19 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       '<h2>' + esc(heading) + '</h2>' + (s.help ? '<p class="help">' + esc(s.help) + '</p>' : '') + body +
       '<p class="err" id="err" role="alert"></p>' +
       '<div class="nav">' + (step > 0 ? '<button type="button" class="link" id="back">Back</button>' : '<span></span>') +
-      '<button type="button" class="btn" id="next">' + (s.contact ? (notYet() ? 'Send it to me' : 'See available times') : 'Continue') + '</button></div>' +
+      '<button type="button" class="btn" id="next">' + (s.contact ? ctaText() : 'Continue') + '</button></div>' +
       (s.contact ? '<p class="fine">By continuing you agree to be contacted by Skyview Financial Group about your request. We never sell your information. <a href="/disclaimers.html#privacy-disclosures">Privacy</a></p>' : '');
 
-    card.querySelectorAll('.opt').forEach(function (b) {
+    card.querySelectorAll('[data-how]').forEach(function (b) {
       b.addEventListener('click', function () {
+        keepContact(); wantsCall = b.getAttribute('data-how') === 'call';
+        if (wantsCall) trackOnce('callpick', 'qualifier_call_option', { step_name: 'contact' });
+        renderQ(); var ph = document.getElementById('f-phone'); if (wantsCall && ph && !ph.value) ph.focus();
+      });
+    });
+    card.querySelectorAll('.opt:not([data-how])').forEach(function (b) {
+      b.addEventListener('click', function () {
+        trackOnce('start', 'qualifier_start', { step_name: s.id });
         var v = b.getAttribute('data-v');
         if (s.multi) { var arr = (a[s.id] || []).slice(), i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); a[s.id] = arr; }
         else a[s.id] = v;
@@ -245,7 +273,11 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     var back = document.getElementById('back');
     if (back) back.addEventListener('click', function () { keepContact(); step = step - 1; renderQ(); });
     document.getElementById('next').addEventListener('click', next);
+    trackOnce('step' + step, 'qualifier_step', { step_number: step + 1, step_name: s.id });
+    if (s.contact) trackOnce('contact', 'qualifier_contact_view', { step_name: 'contact' });
   }
+
+  function ctaText() { return notYet() ? 'Send it to me' : (wantsCall ? 'Request a call' : 'See available times'); }
 
   function keepContact() {
     if (!document.getElementById('f-first')) return;
@@ -262,20 +294,25 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
 
   function submit(err) {
     keepContact();
-    if (!contact.first || !contact.last || !contact.email || !contact.state) { err.textContent = 'Add your name, email and state to continue.'; return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(contact.email)) { err.textContent = 'Check the email address. It needs an @ and a domain.'; return; }
+    if (!contact.first || !contact.last || !contact.email || !contact.state) { track('qualifier_error', { reason: 'missing_fields' }); err.textContent = 'Add your name, email and state to continue.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(contact.email)) { track('qualifier_error', { reason: 'bad_email' }); err.textContent = 'Check the email address. It needs an @ and a domain.'; return; }
+    if (wantsCall && contact.phone.replace(/\D/g, '').length < 10) { track('qualifier_error', { reason: 'call_no_phone' }); err.textContent = 'Add a phone number so Alex can call you.'; return; }
+    contact.callback = wantsCall;
     var btn = document.getElementById('next'); btn.disabled = true; btn.textContent = 'Sending';
+    track('qualifier_submit', { step_name: 'contact', callback: wantsCall ? 'yes' : 'no' });
     var payload = { answers: a, contact: contact, website_url: val('f-hp'), page: location.pathname,
       source: document.referrer ? 'referral: ' + document.referrer.split('/')[2] : 'direct' };
     UTM.forEach(function (k) { payload[k] = utm[k] || ''; });
     fetch('/api/qualify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ''); return d; }); })
       .then(function (d) {
-        if (typeof window.skyviewTrack === 'function') window.skyviewTrack('stock_review_lead', { company: 'concentrated-stock', qualified: d.qualified ? 'yes' : 'no', leads: 1 });
-        if (d.qualified) renderBook(); else renderGuide();
+        track('stock_review_lead', { qualified: d.qualified ? 'yes' : 'no', callback: wantsCall ? 'yes' : 'no', leads: 1 });
+        if (wantsCall) { track('stock_review_callback', { qualified: d.qualified ? 'yes' : 'no' }); renderCall(); }
+        else if (d.qualified) renderBook(); else renderGuide();
       })
       .catch(function (e) {
-        btn.disabled = false; btn.textContent = notYet() ? 'Send it to me' : 'See available times';
+        track('qualifier_error', { reason: 'server' });
+        btn.disabled = false; btn.textContent = ctaText();
         err.textContent = e.message || ('Something went wrong. Email ' + fallback + ' and we will set up a time with you directly.');
       });
   }
@@ -284,7 +321,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     var path = card.getAttribute('data-tidycal');
     if (!path) {
       card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. You are a good fit for a call.</h2>' +
-        '<p class="help">We will reach out within one business day to find a time. A confirmation is in your inbox now.</p>';
+        '<p class="help">Alex will reach out within one business day to find a time.</p>';
       return;
     }
     var nm = ((contact.first || '') + ' ' + (contact.last || '')).trim();
@@ -292,10 +329,33 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     card.innerHTML = '<h2>You are a good fit, ' + esc(contact.first) + '. Pick a time.</h2>' +
       '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
       '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '" data-name="' + esc(nm) + '" data-email="' + esc(contact.email) + '"></div></div>' +
-      '<p class="fine"><strong>Calendar not showing?</strong> <a href="' + esc(link) + '" target="_blank" rel="noopener">Open it in a new tab</a>, or reply to the email we just sent and we will call you.</p>';
+      '<div class="callalt"><button type="button" class="link" id="wantcall">Prefer a call? Alex will reach out</button>' +
+      '<div id="callbox" hidden><label>Best number to reach you<input id="f-phone2" type="tel" autocomplete="tel" value="' + esc(contact.phone) + '"></label>' +
+      '<button type="button" class="btn" id="sendcall">Request a call</button><p class="err" id="err2" role="alert"></p></div></div>' +
+      '<p class="fine"><strong>Calendar not showing?</strong> <a href="' + esc(link) + '" target="_blank" rel="noopener">Open it in a new tab</a>, or use the call option above and Alex will reach out.</p>';
+    document.getElementById('wantcall').addEventListener('click', function () {
+      trackOnce('callpick', 'qualifier_call_option', { step_name: 'booking' });
+      var box = document.getElementById('callbox'); box.hidden = false; document.getElementById('f-phone2').focus();
+    });
+    document.getElementById('sendcall').addEventListener('click', function () {
+      var ph = val('f-phone2'), e2 = document.getElementById('err2'), b = this;
+      if (ph.replace(/\D/g, '').length < 10) { e2.textContent = 'Add a phone number so Alex can call you.'; return; }
+      b.disabled = true; b.textContent = 'Sending';
+      contact.phone = ph; contact.callback = true;
+      var payload = { answers: a, contact: contact, followup: 'callback', page: location.pathname };
+      UTM.forEach(function (k) { payload[k] = utm[k] || ''; });
+      fetch('/api/qualify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(function (r) { if (!r.ok) throw new Error(); track('stock_review_callback', { qualified: 'yes', from: 'booking' }); renderCall(); })
+        .catch(function () { b.disabled = false; b.textContent = 'Request a call'; e2.textContent = 'Something went wrong. Email ' + fallback + ' and we will call you.'; });
+    });
     var el = card.querySelector('.tidycal-embed');
     if (window.TidyCal && typeof window.TidyCal.init === 'function') { window.TidyCal.init(el); return; }
     var sc = document.createElement('script'); sc.src = 'https://asset-tidycal.b-cdn.net/js/embed.js'; sc.async = true; document.body.appendChild(sc);
+  }
+
+  function renderCall() {
+    card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. Alex will call you.</h2>' +
+      '<p class="help">Expect a call from Alex Potenza within one business day at ' + esc(contact.phone) + '.</p>';
   }
 
   function renderGuide() {
@@ -326,6 +386,11 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     if (e.origin !== 'https://tidycal.com' || !e.data || e.data.event !== 'bookingComplete') return;
     if (typeof window.skyviewTrack === 'function') window.skyviewTrack('stock_review_booking', { company: 'concentrated-stock', bookings: 1 });
   });
+
+  if ('IntersectionObserver' in window) {
+    var vo = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { trackOnce('view', 'qualifier_view'); vo.disconnect(); } }, { threshold: 0.4 });
+    vo.observe(card);
+  }
 
   renderQ(); setMeter();
 })();

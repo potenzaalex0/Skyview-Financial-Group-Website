@@ -44,6 +44,9 @@
   var metaLoaded = false;
   // GA4 event name -> Meta standard event
   var META_EVENTS = { stock_review_lead: 'Lead', stock_review_booking: 'Schedule' };
+  // Qualifier progress, sent to Meta as custom events so the campaign can
+  // optimize for an earlier step if full leads are too rare. Event names only.
+  var META_CUSTOM = { qualifier_start: 'QualifierStart', qualifier_contact_view: 'QualifierContact', stock_review_callback: 'CallbackRequest' };
   var query = {};
   try {
     var q = new URLSearchParams(window.location.search);
@@ -140,6 +143,7 @@
       window.fbq('track', META_EVENTS[name]);
       if (name === 'stock_review_lead' && params && params.qualified === 'yes') window.fbq('trackCustom', 'QualifiedLead');
     }
+    if (metaLoaded && typeof window.fbq === 'function' && META_CUSTOM[name]) window.fbq('trackCustom', META_CUSTOM[name]);
     if (!loaded || typeof window.gtag !== 'function') return false;
     var p = {};
     for (var k in params) {

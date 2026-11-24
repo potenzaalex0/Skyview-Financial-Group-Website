@@ -153,7 +153,7 @@ function briefing(a, c, q) {
     '',
     `Name: ${c.first} ${c.last}`,
     `Email: ${c.email}`,
-    `Phone: ${c.phone || 'not given'}${c.sms ? ' (text reminders OK)' : ''}`,
+    `Phone: ${c.phone || 'not given'}${c.sms ? ' (text reminders OK)' : ''}${c.callback ? ' (WANTS A CALL)' : ''}`,
     `State: ${c.state}`,
     `Company: ${c.company || 'not given'}`,
     '',
@@ -224,10 +224,25 @@ module.exports = async (req, res) => {
   if (!a.assets) return res.status(400).json({ error: 'Please answer each question.' });
   if (!c.first || !c.last || !isEmail(c.email) || !c.state) return res.status(400).json({ error: 'Please check your name, email and state.' });
 
+  c.callback = ci.callback === true && !!c.phone;
   const q = qualify(a);
-  const visitor = q.qualified ? bookedEmail(c) : readingEmail(c);
 
-  try {
+  // Follow-up from the booking screen: visitor already submitted; only alert Alex.
+  if (d.followup === 'callback') {
+    try {
+      await sendEmail({ from: FROM, to: [ARCHIVE], reply_to: c.email,
+        subject: `CALL REQUEST: ${c.first} ${c.last} ${c.phone}`,
+        text: `${c.first} ${c.last} asked for a call instead of booking online.\nPhone: ${c.phone}\nEmail: ${c.email}\n\nCall within one business day.\n\n${briefing(a, c, q)}\n\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
+    } catch (err) { console.error('[qualify] callback alert failed', err.message); }
+    return res.status(200).json({ ok: true, qualified: q.qualified });
+  }
+
+  // No automated email to qualified visitors or call requests: Alex follows up
+  // personally (TidyCal sends its own booking confirmation). Only people who
+  // are not a fit get the reading list they were promised on the page.
+  const visitor = (q.qualified || c.callback) ? null : readingEmail(c);
+
+  if (visitor) try {
     await sendEmail({ from: FROM, to: [c.email], bcc: [ARCHIVE], reply_to: REPLY_TO, subject: visitor.subject, text: visitor.text });
   } catch (err) {
     console.error('[qualify] visitor email failed', err.message);
@@ -241,8 +256,8 @@ module.exports = async (req, res) => {
 
   try {
     await sendEmail({ from: FROM, to: [ARCHIVE], reply_to: c.email,
-      subject: `${q.qualified ? 'Stock review QUALIFIED' : 'Stock review (reading list)'}: ${c.first} ${c.last}${c.company ? ', ' + c.company : ''}`,
-      text: `${briefing(a, c, q)}\n\nSource: ${clean(d.source, 200) || 'direct'}\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
+      subject: `${c.callback ? 'CALL REQUEST' : q.qualified ? 'Stock review QUALIFIED' : 'Stock review (reading list)'}: ${c.first} ${c.last}${c.company ? ', ' + c.company : ''}`,
+      text: `${c.callback ? `CALL REQUESTED. They chose "Alex will reach out" instead of booking. Call ${c.phone} within one business day.\n\n` : q.qualified ? 'No automated email was sent to them. If they have not booked within a few hours, text or call personally.\n\n' : ''}${briefing(a, c, q)}\n\nSource: ${clean(d.source, 200) || 'direct'}\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
   } catch (err) {
     console.error('[qualify] notification failed', err.message);
   }
