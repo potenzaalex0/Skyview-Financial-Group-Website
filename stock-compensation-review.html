@@ -267,6 +267,9 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
         if (s.multi) { var arr = (a[s.id] || []).slice(), i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); a[s.id] = arr; }
         else a[s.id] = v;
         renderQ(); setMeter();
+        // Single answer: show the check, pause so it reads as a choice, then move on.
+        // Continue still works; the guard stops a double jump if they click it first.
+        if (!s.multi) { var at = step; setTimeout(function () { if (step === at) next(); }, 700); }
       });
     });
     var back = document.getElementById('back');
