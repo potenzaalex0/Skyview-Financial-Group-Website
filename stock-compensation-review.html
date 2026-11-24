@@ -307,7 +307,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       .then(function (d) {
         track('stock_review_lead', { qualified: d.qualified ? 'yes' : 'no', callback: wantsCall ? 'yes' : 'no', leads: 1 });
         if (wantsCall) { track('stock_review_callback', { qualified: d.qualified ? 'yes' : 'no' }); renderCall(); }
-        else if (d.qualified) renderBook(); else renderGuide();
+        else renderBook(d.qualified);
       })
       .catch(function (e) {
         track('qualifier_error', { reason: 'server' });
@@ -316,7 +316,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
       });
   }
 
-  function renderBook() {
+  function renderBook(fit) {
     var path = card.getAttribute('data-tidycal');
     if (!path) {
       card.innerHTML = '<h2>Thanks, ' + esc(contact.first) + '. You are a good fit for a call.</h2>' +
@@ -325,7 +325,7 @@ h1{font-size:clamp(32px,4.6vw,54px);line-height:1.06;letter-spacing:-.025em;font
     }
     var nm = ((contact.first || '') + ' ' + (contact.last || '')).trim();
     var link = 'https://tidycal.com/' + path + '?name=' + encodeURIComponent(nm) + '&email=' + encodeURIComponent(contact.email || '');
-    card.innerHTML = '<h2>You are a good fit, ' + esc(contact.first) + '. Pick a time.</h2>' +
+    card.innerHTML = '<h2>' + (fit ? 'You are a good fit, ' + esc(contact.first) + '. Pick a time.' : 'Thanks, ' + esc(contact.first) + '. Pick a time.') + '</h2>' +
       '<p class="help">30 minutes by phone or video. Times are shown in your time zone.</p>' +
       '<div class="tidycal-wrap"><div class="tidycal-embed" data-path="' + esc(path) + '" data-name="' + esc(nm) + '" data-email="' + esc(contact.email) + '"></div></div>' +
       '<div class="callalt"><button type="button" class="link" id="wantcall">Prefer a phone call instead? Request a call from an advisor</button>' +

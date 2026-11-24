@@ -243,7 +243,9 @@ module.exports = async (req, res) => {
   // No automated email to qualified visitors or call requests: Alex follows up
   // personally (TidyCal sends its own booking confirmation). Only people who
   // are not a fit get the reading list they were promised on the page.
-  const visitor = (q.qualified || c.callback) ? null : readingEmail(c);
+  // No automated emails to visitors at all (Alex's call, Nov 24): everyone can
+  // book on TidyCal, which sends its own meeting confirmation. Alex follows up personally.
+  const visitor = null;
 
   if (visitor) try {
     await sendEmail({ from: FROM, to: [c.email], bcc: [ARCHIVE], reply_to: REPLY_TO, subject: visitor.subject, text: visitor.text });
@@ -259,8 +261,8 @@ module.exports = async (req, res) => {
 
   try {
     await sendEmail({ from: ALERT_FROM, to: [ARCHIVE], reply_to: c.email,
-      subject: `${c.callback ? 'CALL REQUEST' : q.qualified ? 'Stock review QUALIFIED' : 'Stock review (reading list)'}: ${c.first} ${c.last}${c.company ? ', ' + c.company : ''}`,
-      text: `${c.callback ? `CALL REQUESTED. They chose "Alex will reach out" instead of booking. Call ${c.phone} within one business day.\n\n` : q.qualified ? 'No automated email was sent to them. If they have not booked within a few hours, text or call personally.\n\n' : ''}${briefing(a, c, q)}\n\nSource: ${clean(d.source, 200) || 'direct'}\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
+      subject: `${c.callback ? 'CALL REQUEST' : q.qualified ? 'Stock review QUALIFIED' : 'Stock review (under $1M)'}: ${c.first} ${c.last}${c.company ? ', ' + c.company : ''}`,
+      text: `${c.callback ? `CALL REQUESTED. They chose "Alex will reach out" instead of booking. Call ${c.phone} within one business day.\n\n` : q.qualified ? 'If they have not booked within a few hours, text or call personally.\n\n' : 'Under $1M. They can still book; cancel in TidyCal if it is not a fit.\n\n'}${briefing(a, c, q)}\n\nSource: ${clean(d.source, 200) || 'direct'}\nUTM: ${utm}\nReceived: ${new Date().toISOString()}\n` });
   } catch (err) {
     console.error('[qualify] notification failed', err.message);
   }
